@@ -1,21 +1,24 @@
 import socket
 import threading
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("192.168.1.101", 4434))
+
+class client:
+    def __init__(self):
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect(("192.168.1.101", 4434))
+        t = threading.Thread(target=self.job)
+        t.start()
+
+        while True:
+            try:
+                print(self.s.recv(1024).decode())
+
+            except:
+                pass
+
+    def job(self):
+        while True:
+            self.s.send(input().encode())
 
 
-def job():
-    while True:
-        s.send(input().encode())
-
-
-t = threading.Thread(target=job)
-t.start()
-
-while True:
-    try:
-        print(s.recv(1024).decode())
-
-    except:
-        pass
+client()
