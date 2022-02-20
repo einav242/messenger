@@ -10,8 +10,8 @@ class server:
         self.window = None
         self.server = socket.socket()
         self.inputs = [self.server]
-        self.server.bind(("192.168.1.17", 4434))
-        self.server.listen(5)
+        self.server.bind(("127.0.0.1", 4434))
+        self.server.listen()
         self.t = threading.Thread(target=self.send)
         self.t.start()
         self.draw()
