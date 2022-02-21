@@ -23,6 +23,7 @@ class server:
 
     def greet(self, client):
         names = [n.getpeername() for n in self.inputs if n is not client and n is not self.server]
+        print(names)
         m = "hello user! \n users online: " + str(names)
         client.send(m.encode())
 
