@@ -43,13 +43,13 @@ class server2:
                 client.send("NICK".encode('utf-8'))
                 nickname = client.recv(1024)
 
-                name = nickname.decode()
+                name = nickname.decode().split(":")[0]
 
                 self.nicknames.append(name)
 
                 self.clients.append(client)
 
-                Label(self.window, text="connected to new client " + str(name), bg="white", fg="black",
+                Label(self.window, text="connected with " + str(address)+" nickname: "+str(name), bg="white", fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
                 self.broadcast(f"{name} connected to the server! \n".encode())
@@ -88,7 +88,7 @@ class server2:
                 elif message.decode() == "send1234":
                     names = [n for n in self.nicknames if n is not client and n is not self.server]
                     m = "users online: " + str(names) + "\n"
-                    self.broadcast(m.encode())
+                    client.send(m.encode())
                 else:
                     self.broadcast(message)
                 print(message)
@@ -102,7 +102,7 @@ class server2:
                 name = nickname.split()[0]
                 m = f"{name} leave\n"
                 self.broadcast(m.encode())
-                Label(self.window, text=str(name) + "left", bg="white", fg="black",
+                Label(self.window, text=str(name) + " left", bg="white", fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
                 break
