@@ -65,13 +65,6 @@ class client2:
         self.sendto_button.config(font=("Ariel", 12))
         self.sendto_button.pack(padx=20, pady=5)
 
-        # self.users_label = tkinter.Label(self.win, text="users:", bg="lightgray")
-        # self.users_label.config(font=("Ariel", 12))
-        # self.users_label.pack(padx=20, pady=5)
-        #
-        # self.users_area = tkinter.scrolledtext.ScrolledText(self.win)
-        # self.users_area.pack(padx=20, pady=5)
-        # self.users_area.config(state='disable')
 
         self.gui_done = True
 

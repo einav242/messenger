@@ -9,10 +9,23 @@
 #     window.destroy()
 #     exit()
 
+def find_name(name: str):
+    count = 0
+    s = ''
+    for i in range(len(name)):
+        if count < 2:
+            count += 1
+            continue
+        if name[i] == ":":
+            break
+        s = s + name[i]
+        count += 1
+    print(s)
+
 
 if __name__ == '__main__':
-    a="einav:"
-    print(a.split(":")[0])
+    a="b'einav:'"
+    find_name(a)
     # window = Tk()
     # # window.title("Client")
     # # window.configure(background="white")

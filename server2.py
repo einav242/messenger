@@ -10,6 +10,7 @@ PORT = 9090
 
 class server2:
     def __init__(self):
+        self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
         self.server.listen(5)
@@ -23,35 +24,51 @@ class server2:
             pass
         self.receive()
 
-    def broadcast(self, message):
-        for client in self.clients:
-            client.send(message)
+    def broadcast(self, message, non_receptors=None):
+        if non_receptors is None:
+            for client in self.clients:
+                client.send(message)
+        else:
+            for client in self.clients:
+                if client == non_receptors:
+                    continue
+                client.send(message)
 
     def receive(self):
         while self.running:
-            try:
+            # try:
                 client, address = self.server.accept()
                 print(f"Connected with {str(address)}!")
 
                 client.send("NICK".encode('utf-8'))
                 nickname = client.recv(1024)
 
-                name = nickname.split()[0]
+                name = nickname.decode()
 
                 self.nicknames.append(name)
+
                 self.clients.append(client)
 
-                print(f"Nickname of client is {name}")
-                self.broadcast(f"{nickname} connected to the server! \n".encode())
-                names = [n for n in self.nicknames if n is not client and n is not self.server]
-                m = "hello user! \n users online: " + str(names)+"\n"
+                Label(self.window, text="connected to new client " + str(name), bg="white", fg="black",
+                      font="none 12 bold").grid(row=self.count, column=0, sticky=W)
+                self.count += 1
+                self.broadcast(f"{name} connected to the server! \n".encode())
+                names = []
+                for n in self.nicknames:
+                    if n is not client:
+                        print(n)
+                        names.append(n)
+                print(names)
+                m = "hello user! \n users online: " + str(names) + "\n"
+                m2 = "users online: " + str(names) + "\n"
+                self.broadcast(m2.encode(), client)
                 client.send(m.encode())
                 # client.send("Connected to the server".encode())
 
                 thread = threading.Thread(target=self.handle, args=(client,))
                 thread.start()
-            except:
-                break
+            # except:
+            #     break
 
     def handle(self, client):
         while True:
@@ -66,22 +83,30 @@ class server2:
                 nickname = self.nicknames[index]
                 self.nicknames.remove(nickname)
                 names = [n for n in self.nicknames if n is not client and n is not self.server]
-                name=nickname.split()[0]
+                name = nickname.split()[0]
                 m = f"{name} leave\n users online: " + str(names)
                 self.broadcast(m.encode())
+                Label(self.window, text=str(name)+"left", bg="white", fg="black",
+                      font="none 12 bold").grid(row=self.count, column=0, sticky=W)
+                self.count += 1
                 break
 
     def gui_loop(self):
-        self.win = tkinter.Tk()
-        self.win.configure(bg="lightgray")
+        self.window = Tk()
+        self.window.title("server")
+        self.window.configure(background="white")
+        Label(self.window, text="starting sever...", bg="white", fg="black",
+              font="none 12 bold").grid(row=1, column=0, sticky=W)
+        Label(self.window, text="                                                      ", bg="white", fg="black",
+              font="none 12 bold").grid(row=1, column=1, sticky=W)
 
-        self.win.protocol("WM_DELETE_WINDOW", self.stop)
+        self.window.protocol("WM_DELETE_WINDOW", self.stop)
 
-        self.win.mainloop()
+        self.window.mainloop()
 
     def stop(self):
         self.running = False
-        self.win.destroy()
+        self.window.destroy()
         self.server.close()
         exit(0)
 
