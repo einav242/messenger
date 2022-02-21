@@ -65,6 +65,9 @@ class client2:
         self.sendto_button.config(font=("Ariel", 12))
         self.sendto_button.pack(padx=20, pady=5)
 
+        self.logeOut_button = tkinter.Button(self.win, text="logeOut", command=self.stop)
+        self.logeOut_button.config(font=("Ariel", 12))
+        self.logeOut_button.pack(padx=20, pady=5)
 
         self.gui_done = True
 
