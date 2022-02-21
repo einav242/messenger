@@ -66,18 +66,24 @@ class server2:
                 break
 
     def handle(self, client):
+        self.temp=-1
         while True:
             try:
                 message = client.recv(1024)
                 if message.decode().split()[0] == "name1234":
                     user = message.decode().split()[1]
-                    try:
-                        i=user+":"
-                        index = self.nicknames.index(i)
-                    except:
+                    for n in self.nicknames:
+                        i = str(n.split(":")[0])
+                        if i == user:
+                            index = self.nicknames.index(n)
+                            person = self.clients[index]
+                            person.send(message)
+                            self.temp=0
+                            break
+                    if self.temp!=0:
                         msg = f"user {user} not found \n"
-                        print(self.nicknames)
                         self.broadcast(msg.encode())
+                    self.temp=-1
                 else:
                     self.broadcast(message)
             except:
@@ -88,7 +94,7 @@ class server2:
                 self.nicknames.remove(nickname)
                 names = [n for n in self.nicknames if n is not client and n is not self.server]
                 name = nickname.split()[0]
-                m = f"{name} leave\n users online: " + str(names)
+                m = f"{name} leave\n users online: " + str(names)+"\n"
                 self.broadcast(m.encode())
                 Label(self.window, text=str(name) + "left", bg="white", fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
