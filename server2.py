@@ -36,7 +36,7 @@ class server2:
 
     def receive(self):
         while self.running:
-            # try:
+            try:
                 client, address = self.server.accept()
                 print(f"Connected with {str(address)}!")
 
@@ -53,12 +53,7 @@ class server2:
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
                 self.broadcast(f"{name} connected to the server! \n".encode())
-                names = []
-                for n in self.nicknames:
-                    if n is not client:
-                        print(n)
-                        names.append(n)
-                print(names)
+                names = [n for n in self.nicknames if n is not client and n is not self.server]
                 m = "hello user! \n users online: " + str(names) + "\n"
                 m2 = "users online: " + str(names) + "\n"
                 self.broadcast(m2.encode(), client)
@@ -67,8 +62,8 @@ class server2:
 
                 thread = threading.Thread(target=self.handle, args=(client,))
                 thread.start()
-            # except:
-            #     break
+            except:
+                break
 
     def handle(self, client):
         while True:
