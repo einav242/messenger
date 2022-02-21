@@ -7,13 +7,11 @@ from tkinter import simpledialog
 
 class client2:
     def __init__(self, host, port):
-        self.users = []
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((host, port))
         self.msg = tkinter.Tk()
         self.msg.withdraw()
         self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.msg)
-        print(self.nickname)
         self.gui_done = False
         self.running = True
         gui_thread = threading.Thread(target=self.gui_loop)

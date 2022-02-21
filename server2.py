@@ -13,7 +13,7 @@ class server2:
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
-        self.server.listen(5)
+        self.server.listen(15)
         self.clients = []
         self.nicknames = []
         self.running = True
@@ -38,7 +38,6 @@ class server2:
         while self.running:
             try:
                 client, address = self.server.accept()
-                print(f"Connected with {str(address)}!")
 
                 client.send("NICK".encode('utf-8'))
                 nickname = client.recv(1024)
@@ -58,7 +57,6 @@ class server2:
                 m2 = "users online: " + str(names) + "\n"
                 self.broadcast(m2.encode(), client)
                 client.send(m.encode())
-                # client.send("Connected to the server".encode())
 
                 thread = threading.Thread(target=self.handle, args=(client,))
                 thread.start()
@@ -91,7 +89,6 @@ class server2:
                     client.send(m.encode())
                 else:
                     self.broadcast(message)
-                print(message)
             except:
                 index = self.clients.index(client)
                 self.clients.remove(client)
@@ -133,5 +130,4 @@ class server2:
         exit(0)
 
 
-print("server runnig....")
 server2()
