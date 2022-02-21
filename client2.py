@@ -77,15 +77,21 @@ class client2:
 
     def write_to(self):
         name = self.sendto_area.get('1.0', 'end')
-        message = f"name1234 {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
-        self.s.send(message.encode('utf-8'))
-        self.input_area.delete('1.0', 'end')
-        self.sendto_area.delete('1.0', 'end')
+        message = f"private massage {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
+        try:
+            self.s.send(message.encode())
+            self.input_area.delete('1.0', 'end')
+            self.sendto_area.delete('1.0', 'end')
+        except:
+            pass
 
     def write(self):
-        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
-        self.s.send(message.encode())
-        self.input_area.delete('1.0', 'end')
+        try:
+            message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+            self.s.send(message.encode())
+            self.input_area.delete('1.0', 'end')
+        except:
+            pass
 
     def stop2(self):
         self.running = False

@@ -70,7 +70,7 @@ class server2:
         while True:
             try:
                 message = client.recv(1024)
-                if message.decode().split()[0] == "name1234":
+                if message.decode().split()[0] == "private massage":
                     user = message.decode().split()[1]
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
@@ -78,6 +78,7 @@ class server2:
                             index = self.nicknames.index(n)
                             person = self.clients[index]
                             person.send(message)
+                            client.send(message)
                             self.temp=0
                             break
                     if self.temp!=0:
