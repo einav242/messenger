@@ -1,51 +1,142 @@
 import socket
 import threading
 from tkinter import *
+import tkinter.scrolledtext
+from tkinter import simpledialog
 
 
 class client:
-    def __init__(self):
-        self.window = None
+    def __init__(self, host, port):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(("127.0.0.1", 4434))
-        # t = threading.Thread(target=self.send)
-        # t.start()
-        t2 = threading.Thread(target=self.rec)
-        t2.start()
-        t3 = threading.Thread(target=self.draw)
-        t3.start()
-
-    def rec(self):
-        while True:
-            try:
-                print(self.s.recv(1024).decode())
-            except:
-                pass
-
-    def send_to(self, msg):
-        # while True:
+        self.s.connect((host, port))
+        self.msg = tkinter.Tk()
+        self.msg.withdraw()
+        self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.msg)
+        self.gui_done = False
+        self.running = True
+        gui_thread = threading.Thread(target=self.gui_loop)
+        receive_thread = threading.Thread(target=self.receive)
         try:
-            self.s.send(msg.get())
+            gui_thread.start()
         except:
-            print("hi")
+            pass
+        try:
+            receive_thread.start()
+        except:
+            pass
 
-    def temp(self, msg):
-        self.s.send(msg.get().encode())
-        # msg.delete(0.0, END)
+    def gui_loop(self):
+        self.win = tkinter.Tk()
+        self.win.configure(bg="lightgray")
 
-    def draw(self):
-        self.window = Tk()
-        self.window.title("client")
-        self.window.configure(background="white")
-        Label(self.window, text="                                                                 ", bg="white",
-              fg="black", font="none 12 bold").grid(row=1, column=5, sticky=W)
-        Label(self.window, text="message: ", bg="white", fg="black",
-              font="none 12 bold").grid(row=1, column=0, sticky=W)
-        textentry1 = Entry(self.window, width=50, bg="white")
-        textentry1.grid(row=2, column=0, sticky=W)
-        msg = textentry1.get()
-        Button(self.window, text="send all", width=14, command=self.temp(textentry1)).grid(row=7, column=0, sticky=W)
-        self.window.mainloop()
+        self.name_label = tkinter.Label(self.win, text=self.nickname, bg="lightgray")
+        self.name_label.config(font=("Ariel", 12))
+        self.name_label.pack(padx=20, pady=5)
+
+        self.start_button = tkinter.Button(self.win, text="start", command=self.write)
+        self.start_button.config(font=("Ariel", 12))
+        self.start_button.pack(padx=20, pady=5)
+
+        self.users_button = tkinter.Button(self.win, text="online users list", command=self.user_list)
+        self.users_button.config(font=("Ariel", 12))
+        self.users_button.pack(padx=20, pady=5)
+
+        self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
+        self.chat_label.config(font=("Ariel", 12))
+        self.chat_label.pack(padx=20, pady=5)
+
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
+        self.text_area.pack(padx=20, pady=5)
+        self.text_area.config(state='disable')
+
+        self.msg_label = tkinter.Label(self.win, text="Message:", bg="lightgray")
+        self.msg_label.config(font=("Ariel", 12))
+        self.msg_label.pack(padx=20, pady=5)
+
+        self.input_area = tkinter.Text(self.win, height=3)
+        self.input_area.pack(padx=20, pady=5)
+
+        self.send_button = tkinter.Button(self.win, text="send all", command=self.write)
+        self.send_button.config(font=("Ariel", 12))
+        self.send_button.pack(padx=20, pady=5)
+
+        self.sendto_area = tkinter.Text(self.win, height=1, width=20)
+        self.sendto_area.pack(padx=20, pady=5)
+
+        self.sendto_button = tkinter.Button(self.win, text="send to", command=self.write_to)
+        self.sendto_button.config(font=("Ariel", 12))
+        self.sendto_button.pack(padx=20, pady=5)
+
+        self.logeOut_button = tkinter.Button(self.win, text="logeOut", command=self.stop)
+        self.logeOut_button.config(font=("Ariel", 12))
+        self.logeOut_button.pack(padx=20, pady=5)
+
+        self.gui_done = True
+
+        self.win.protocol("WM_DELETE_WINDOW", self.stop)
+
+        self.win.mainloop()
+
+    def user_list(self):
+        message="send1234"
+        self.s.send(message.encode())
+
+    def write_to(self):
+        name = self.sendto_area.get('1.0', 'end')
+        message = f"private {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
+        try:
+            self.s.send(message.encode())
+            self.input_area.delete('1.0', 'end')
+            self.sendto_area.delete('1.0', 'end')
+        except:
+            pass
+
+    def write(self):
+        try:
+            message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+            self.s.send(message.encode())
+            self.input_area.delete('1.0', 'end')
+        except:
+            pass
+
+    def stop2(self):
+        self.running = False
+        self.msg.destroy()
+        self.s.close()
+        exit(0)
+
+    def stop(self):
+        self.running = False
+        self.win.destroy()
+        self.s.close()
+        exit(0)
+
+    def start(self):
+        message = self.s.recv(1024)
+
+        self.users_area.config(state='normal')
+        self.users_area.insert('end', message)
+        self.users_area.yview('end')
+        self.users_area.config(state='disabled')
+
+    def receive(self):
+        while self.running:
+            try:
+                message = self.s.recv(1024)
+                if message == 'NICK':
+                    self.s.send(self.nickname.encode())
+                else:
+                    if self.gui_done:
+                        self.text_area.config(state='normal')
+                        self.text_area.insert('end', message)
+                        self.text_area.yview('end')
+                        self.text_area.config(state='disabled')
+            except ConnectionAbortedError:
+                break
+            except:
+                self.s.close()
+                print("Error")
+                exit(0)
 
 
-client()
+client("127.0.0.1", 9090)
