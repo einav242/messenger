@@ -42,6 +42,6 @@ if __name__ == '__main__':
     # # output.grid(row=5, column=0, columnspan=2, sticky=W)
     # # # my_compdictionary = {'algorithm': 'step by step instruction to complete a task', 'bug': 'piece of code that causes'}
     # # # Label(window, text="click to exit:", bg="black", fg="white", font="none 12 bold").grid(row=6, column=0, sticky=W)
-    # # Button(window, text="Login", width=14, command=click(textentry1,textentry2)).grid(row=7, column=0, sticky=W)
+    # Button(window, text="Login", width=14, command=click(textentry1,textentry2)).grid(row=7, column=0, sticky=W)
     #
     # window.mainloop()

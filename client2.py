@@ -39,6 +39,10 @@ class client2:
         self.start_button.config(font=("Ariel", 12))
         self.start_button.pack(padx=20, pady=5)
 
+        self.users_button = tkinter.Button(self.win, text="online users list", command=self.user_list)
+        self.users_button.config(font=("Ariel", 12))
+        self.users_button.pack(padx=20, pady=5)
+
         self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
         self.chat_label.config(font=("Ariel", 12))
         self.chat_label.pack(padx=20, pady=5)
@@ -75,9 +79,13 @@ class client2:
 
         self.win.mainloop()
 
+    def user_list(self):
+        message="send1234"
+        self.s.send(message.encode())
+
     def write_to(self):
         name = self.sendto_area.get('1.0', 'end')
-        message = f"private massage {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
+        message = f"private {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
         try:
             self.s.send(message.encode())
             self.input_area.delete('1.0', 'end')

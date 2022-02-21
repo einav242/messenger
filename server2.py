@@ -66,11 +66,11 @@ class server2:
                 break
 
     def handle(self, client):
-        self.temp=-1
+        self.temp = -1
         while True:
             try:
                 message = client.recv(1024)
-                if message.decode().split()[0] == "private massage":
+                if message.decode().split()[0] == "private":
                     user = message.decode().split()[1]
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
@@ -79,14 +79,19 @@ class server2:
                             person = self.clients[index]
                             person.send(message)
                             client.send(message)
-                            self.temp=0
+                            self.temp = 0
                             break
-                    if self.temp!=0:
+                    if self.temp != 0:
                         msg = f"user {user} not found \n"
-                        self.broadcast(msg.encode())
-                    self.temp=-1
+                        client.send(msg.encode())
+                    self.temp = -1
+                elif message.decode() == "send1234":
+                    names = [n for n in self.nicknames if n is not client and n is not self.server]
+                    m = "users online: " + str(names) + "\n"
+                    self.broadcast(m.encode())
                 else:
                     self.broadcast(message)
+                print(message)
             except:
                 index = self.clients.index(client)
                 self.clients.remove(client)
@@ -95,7 +100,7 @@ class server2:
                 self.nicknames.remove(nickname)
                 names = [n for n in self.nicknames if n is not client and n is not self.server]
                 name = nickname.split()[0]
-                m = f"{name} leave\n users online: " + str(names)+"\n"
+                m = f"{name} leave\n"
                 self.broadcast(m.encode())
                 Label(self.window, text=str(name) + "left", bg="white", fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
@@ -110,10 +115,17 @@ class server2:
               font="none 12 bold").grid(row=1, column=0, sticky=W)
         Label(self.window, text="                                                      ", bg="white", fg="black",
               font="none 12 bold").grid(row=1, column=1, sticky=W)
+        Button(self.window, text="LogOut", width=14, command=self.log_out).grid(row=1, column=2, sticky=W)
 
         self.window.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.window.mainloop()
+
+    def log_out(self):
+        self.running = False
+        self.window.destroy()
+        self.server.close()
+        exit(0)
 
     def stop(self):
         self.running = False
