@@ -69,8 +69,17 @@ class server2:
         while True:
             try:
                 message = client.recv(1024)
-                print(f"{self.nicknames[self.clients.index(client)]} says {message}")
-                self.broadcast(message)
+                if message.decode().split()[0] == "name1234":
+                    user = message.decode().split()[1]
+                    try:
+                        i=user+":"
+                        index = self.nicknames.index(i)
+                    except:
+                        msg = f"user {user} not found \n"
+                        print(self.nicknames)
+                        self.broadcast(msg.encode())
+                else:
+                    self.broadcast(message)
             except:
                 index = self.clients.index(client)
                 self.clients.remove(client)
@@ -81,7 +90,7 @@ class server2:
                 name = nickname.split()[0]
                 m = f"{name} leave\n users online: " + str(names)
                 self.broadcast(m.encode())
-                Label(self.window, text=str(name)+"left", bg="white", fg="black",
+                Label(self.window, text=str(name) + "left", bg="white", fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
                 break

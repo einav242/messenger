@@ -77,8 +77,9 @@ class client2:
 
     def write_to(self):
         name = self.sendto_area.get('1.0', 'end')
-        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+        message = f"name1234 {name} {self.nickname}: {self.input_area.get('1.0', 'end')}"
         self.s.send(message.encode('utf-8'))
+        self.input_area.delete('1.0', 'end')
         self.sendto_area.delete('1.0', 'end')
 
     def write(self):
@@ -110,8 +111,6 @@ class client2:
         while self.running:
             try:
                 message = self.s.recv(1024)
-                m = message.split()[0]
-                print(m)
                 if message == 'NICK':
                     self.s.send(self.nickname.encode())
                 else:
