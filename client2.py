@@ -141,4 +141,4 @@ class client2:
                 exit(0)
 
 
-client = client2("127.0.0.1", 9090)
+client2("127.0.0.1", 9090)

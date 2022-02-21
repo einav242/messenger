@@ -98,7 +98,6 @@ class server2:
                 client.close()
                 nickname = self.nicknames[index]
                 self.nicknames.remove(nickname)
-                names = [n for n in self.nicknames if n is not client and n is not self.server]
                 name = nickname.split()[0]
                 m = f"{name} leave\n"
                 self.broadcast(m.encode())
