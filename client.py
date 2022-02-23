@@ -50,63 +50,32 @@ class client:
         self.user.grid(row=9, column=0, sticky=W)
         Button(self.win, text="Send private", width=12, command=self.write_to).grid(row=9, column=1, sticky=W)
 
-        Button(self.win, text="Log Out", width=12, command=self.stop).grid(row=10, column=0, sticky=W)
+        Label(self.win, text="Server File Name:", bg="white", fg="black", font="none 12 bold").grid(row=10, column=0,
+                                                                                                    sticky=W)
+        self.file = Entry(self.win, width=40, bg="white")
+        self.file.grid(row=11, column=0, sticky=W)
+        Label(self.win, text="Save as:", bg="white", fg="black", font="none 12 bold").grid(row=10, column=1,
+                                                                                           sticky=W)
+        self.file_save = Entry(self.win, width=40, bg="white")
+        self.file_save.grid(row=11, column=1, sticky=W)
+        Button(self.win, text="Download", width=12, command=self.download).grid(row=11, column=2, sticky=W)
+
+        Button(self.win, text="Log Out", width=12, command=self.stop).grid(row=12, column=0, sticky=W)
         self.gui_done = True
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.win.mainloop()
-        #
-        # self.win = tkinter.Tk()
-        # self.win.configure(bg="lightgray")
-        #
-        # self.name_label = tkinter.Label(self.win, text=self.nickname, bg="lightgray")
-        # self.name_label.config(font=("Ariel", 12))
-        # self.name_label.pack(padx=20, pady=5)
-        #
-        # self.start_button = tkinter.Button(self.win, text="start", command=self.write)
-        # self.start_button.config(font=("Ariel", 12))
-        # self.start_button.pack(padx=20, pady=5)
-        #
-        # self.users_button = tkinter.Button(self.win, text="online users list", command=self.user_list)
-        # self.users_button.config(font=("Ariel", 12))
-        # self.users_button.pack(padx=20, pady=5)
-        #
-        # self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
-        # self.chat_label.config(font=("Ariel", 12))
-        # self.chat_label.pack(padx=20, pady=5)
-        #
-        # self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
-        # self.text_area.pack(padx=20, pady=5)
-        # self.text_area.config(state='disable')
-        #
-        # self.msg_label = tkinter.Label(self.win, text="Message:", bg="lightgray")
-        # self.msg_label.config(font=("Ariel", 12))
-        # self.msg_label.pack(padx=20, pady=5)
-        #
-        # self.input_area = tkinter.Text(self.win, height=3)
-        # self.input_area.pack(padx=20, pady=5)
-        #
-        # self.send_button = tkinter.Button(self.win, text="send all", command=self.write)
-        # self.send_button.config(font=("Ariel", 12))
-        # self.send_button.pack(padx=20, pady=5)
-        #
-        # self.sendto_area = tkinter.Text(self.win, height=1, width=20)
-        # self.sendto_area.pack(padx=20, pady=5)
-        #
-        # self.sendto_button = tkinter.Button(self.win, text="send to", command=self.write_to)
-        # self.sendto_button.config(font=("Ariel", 12))
-        # self.sendto_button.pack(padx=20, pady=5)
-        #
-        # self.logeOut_button = tkinter.Button(self.win, text="logeOut", command=self.stop)
-        # self.logeOut_button.config(font=("Ariel", 12))
-        # self.logeOut_button.pack(padx=20, pady=5)
-        #
-        # self.gui_done = True
-        #
-        # self.win.protocol("WM_DELETE_WINDOW", self.stop)
-        #
-        # self.win.mainloop()
+
+    def download(self):
+        self.soc = socket.socket()
+        self.soc.connect(("127.0.0.1", 1234))
+        message = self.file.get()
+        file_save = self.file_save.get()
+        self.soc.send(message.encode())
+        self.file.delete(0, END)
+        self.soc.close()
+
 
     def user_list(self):
         message = "send1234"
@@ -114,7 +83,7 @@ class client:
 
     def write_to(self):
         name = self.user.get()
-        message = f"private {name} {self.nickname}: {self.msg.get()}"+"\n"
+        message = f"private {name} {self.nickname}: {self.msg.get()}" + "\n"
         try:
             self.s.send(message.encode())
             self.msg.delete(0, END)
@@ -123,7 +92,7 @@ class client:
             pass
 
     def write(self):
-        message = f"{self.nickname}: {self.msg.get()}"+"\n"
+        message = f"{self.nickname}: {self.msg.get()}" + "\n"
         self.s.send(message.encode())
         self.msg.delete(0, END)
 
@@ -131,12 +100,15 @@ class client:
         self.running = False
         self.msg.destroy()
         self.s.close()
+        self.soc.close()
         exit(0)
 
     def stop(self):
         self.running = False
         self.win.destroy()
         self.s.close()
+        self.soc.close()
+
         exit(0)
 
     def start(self):

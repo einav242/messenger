@@ -3,6 +3,7 @@ import select
 import threading
 import tkinter
 from tkinter import *
+import os
 
 HOST = '127.0.0.1'
 PORT = 9090
@@ -13,6 +14,9 @@ class server:
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
+        self.soc=socket.socket()
+        self.soc.bind((HOST,1234))
+        self.soc.listen(15)
         self.server.listen(15)
         self.clients = []
         self.nicknames = []
@@ -20,6 +24,11 @@ class server:
         try:
             gui_thread = threading.Thread(target=self.gui_loop)
             gui_thread.start()
+        except:
+            pass
+        try:
+            file_thread = threading.Thread(target=self.send_file)
+            file_thread.start()
         except:
             pass
         self.receive()
@@ -48,7 +57,8 @@ class server:
 
                 self.clients.append(client)
 
-                Label(self.window, text="connected with " + str(address)+" nickname: "+str(name), bg="white", fg="black",
+                Label(self.window, text="connected with " + str(address) + " nickname: " + str(name), bg="white",
+                      fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
                 self.broadcast(f"{name} connected to the server! \n".encode())
@@ -103,6 +113,15 @@ class server:
                 self.count += 1
                 break
 
+    def send_file(self):
+        while self.running:
+            try:
+                client, address = self.soc.accept()
+                nickname = client.recv(1024)
+                print(nickname.decode())
+            except:
+                break
+
     def gui_loop(self):
         self.window = Tk()
         self.window.title("server")
@@ -121,12 +140,14 @@ class server:
         self.running = False
         self.window.destroy()
         self.server.close()
+        self.soc.close()
         exit(0)
 
     def stop(self):
         self.running = False
         self.window.destroy()
         self.server.close()
+        self.soc.close()
         exit(0)
 
 
