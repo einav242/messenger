@@ -68,13 +68,16 @@ class client:
         self.win.mainloop()
 
     def download(self):
-        self.soc = socket.socket()
-        self.soc.connect(("127.0.0.1", 1234))
-        message = self.file.get()
-        file_save = self.file_save.get()
-        self.soc.send(message.encode())
-        self.file.delete(0, END)
-        self.soc.close()
+        try:
+            self.soc = socket.socket()
+            self.soc.connect(("127.0.0.1", 1234))
+            message = self.file.get()
+            file_save = self.file_save.get()
+            self.soc.send(message.encode())
+            self.file.delete(0, END)
+            self.soc.close()
+        except:
+            pass
 
 
     def user_list(self):
@@ -107,7 +110,10 @@ class client:
         self.running = False
         self.win.destroy()
         self.s.close()
-        self.soc.close()
+        try:
+            self.soc.close()
+        except:
+            pass
 
         exit(0)
 

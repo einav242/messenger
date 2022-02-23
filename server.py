@@ -14,8 +14,8 @@ class server:
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
-        self.soc=socket.socket()
-        self.soc.bind((HOST,1234))
+        self.soc = socket.socket()
+        self.soc.bind((HOST, 1234))
         self.soc.listen(15)
         self.server.listen(15)
         self.clients = []
@@ -67,9 +67,11 @@ class server:
                 m2 = "users online: " + str(names) + "\n"
                 self.broadcast(m2.encode(), client)
                 client.send(m.encode())
-
-                thread = threading.Thread(target=self.handle, args=(client,))
-                thread.start()
+                try:
+                    thread = threading.Thread(target=self.handle, args=(client,))
+                    thread.start()
+                except:
+                    break
             except:
                 break
 
