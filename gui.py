@@ -31,10 +31,10 @@ if __name__ == '__main__':
     # # window.configure(background="white")
     # # Label(window, text="username:", bg="white", fg="black",
     # #       font="none 12 bold").grid(row=1, column=0, sticky=W)
-    # # textentry1 = Entry(window, width=20, bg="white")
-    # # textentry1.grid(row=2, column=0, sticky=W)
-    # # Label(window, text="address:", bg="white", fg="black",
-    # #       font="none 12 bold").grid(row=3, column=0, sticky=W)
+    # textentry1 = Entry(window, width=20, bg="white")
+    # textentry1.grid(row=2, column=0, sticky=W)
+    # Label(window, text="address:", bg="white", fg="black",
+    #       font="none 12 bold").grid(row=3, column=0, sticky=W)
     # # textentry2 = Entry(window, width=20, bg="white")
     # # textentry2.grid(row=4, column=0, sticky=W)
     # # Label(window, text="", bg="white", fg="black", font="none 12 bold").grid(row=8, column=0, sticky=W)
