@@ -138,7 +138,7 @@ class server:
                     with open(file, "rb") as f:
                         file_size = os.path.getsize(file)
                         if file_size < 64000:
-                            m = "exist"+" " + str(file_size)
+                            m = "exist" + " " + str(file_size)
                             self.soc.sendto(m.encode(), address)
                             buffer = f.read(256)
                             self.soc.sendto(buffer, address)
@@ -153,7 +153,7 @@ class server:
                             m = "the file is too large"
                             person.send(m.encode())
                 else:
-                    m1="not"
+                    m1 = "not"
                     self.soc.sendto(m1.encode(), address)
                     m = "the file does not exist\n"
                     person.send(m.encode())

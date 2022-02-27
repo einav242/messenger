@@ -112,9 +112,6 @@ class client:
                     self.file.delete(0, END)
                     self.file_save.delete(0, END)
                     self.soc.close()
-            # else:
-            #     self.clear
-            #     self.soc.close()
         except:
             pass
 
