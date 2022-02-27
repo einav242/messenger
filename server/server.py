@@ -116,21 +116,31 @@ class server:
 
     def send_file(self):
         while self.running:
-            try:
-                file, address = self.soc.recvfrom(2048)
-                with open(file.decode(), "rb") as f:
-                    file_size = os.path.getsize(file.decode())
-                    self.soc.sendto(str(file_size).encode(), address)
-                    buffer = f.read(256)
-                    self.soc.sendto(buffer, address)
-                    total_sent = len(buffer)
-                    while total_sent < file_size:
+            while self.running:
+                try:
+                    msg, address = self.soc.recvfrom(2048)
+                    file = msg.decode().split()[1]
+                    name = msg.decode().split()[0]
+                    with open(file, "rb") as f:
+                        file_size = os.path.getsize(file)
+                        self.soc.sendto(str(file_size).encode(), address)
                         buffer = f.read(256)
                         self.soc.sendto(buffer, address)
-                        total_sent += len(buffer)
-
-            except:
-                break
+                        total_sent = len(buffer)
+                        while total_sent < file_size:
+                            buffer = f.read(256)
+                            self.soc.sendto(buffer, address)
+                            total_sent += len(buffer)
+                    for n in self.nicknames:
+                        i = str(n.split(":")[0])
+                        if i == name:
+                            index = self.nicknames.index(n)
+                            person = self.clients[index]
+                            b = "finish download the last byte is: "+buffer.decode()
+                            person.send(b.encode())
+                            break
+                except:
+                    break
 
     def gui_loop(self):
         self.window = Tk()
