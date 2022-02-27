@@ -79,7 +79,14 @@ class server:
         while True:
             try:
                 message = client.recv(1024)
-                if message.decode().split()[0] == "private":
+                if message.decode() == "show_file1234":
+                    files = os.listdir()
+                    for f in files:
+                        if f == "server.py":
+                            continue
+                        m = str(f) + "\n"
+                        client.send(m.encode())
+                elif message.decode().split()[0] == "private":
                     user = message.decode().split()[1]
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
@@ -136,7 +143,7 @@ class server:
                         if i == name:
                             index = self.nicknames.index(n)
                             person = self.clients[index]
-                            b = "finish download the last byte is: "+buffer.decode()
+                            b = "finish download the last byte is: " + buffer.decode() + "\n"
                             person.send(b.encode())
                             break
                 except:
@@ -155,6 +162,11 @@ class server:
         self.window.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.window.mainloop()
+
+    def list_files(self):
+        files = os.listdir()
+        for f in files:
+            print(f)
 
     def log_out(self):
         self.running = False

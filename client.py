@@ -28,44 +28,53 @@ class client:
     def gui_loop(self):
         self.win = Tk()
         self.win.title("client")
-        self.win.configure(background="white")
+        self.win.configure(background="#6F8EB1")
 
-        Button(self.win, text="start", width=12, command=self.write).grid(row=0, column=0, sticky=W)
-        Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getpeername()), bg="white", fg="black",
-              font="none 12 bold").grid(row=0, column=1, sticky=W)
+        Button(self.win, text="start", width=12, command=self.write, fg="black", bg="green").grid(row=0, column=0,
+                                                                                                  sticky=W)
+        Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getpeername()), bg="#6F8EB1",
+              fg="black", font="Helvetica 11 bold").grid(row=1, column=0, sticky=W)
 
         Button(self.win, text="Show Online", width=12, command=self.user_list).grid(row=0, column=2, sticky=W)
-        Button(self.win, text="Show Server Files", width=12, command=None).grid(row=2, column=2, sticky=W)
+        Button(self.win, text="Show Server Files", width=12, command=self.show_file).grid(row=2, column=2, sticky=W)
 
-        Label(self.win, text="Chat:", bg="white", fg="black", font="none 12 bold").grid(row=3, column=1, sticky=W)
+        Label(self.win, text="Chat:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=3, column=0, sticky=W)
         self.input_area = Text(self.win, width=75, height=15, wrap=WORD, background="lightgray")
         self.input_area.grid(row=5, column=0, columnspan=2, sticky=W)
 
-        Label(self.win, text="Message:", bg="white", fg="black", font="none 12 bold").grid(row=6, column=0, sticky=W)
+        Label(self.win, text="Message:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=6, column=0, sticky=W)
         self.msg = Entry(self.win, width=40, bg="white")
         self.msg.grid(row=7, column=0, sticky=W)
+
         Button(self.win, text="Send all", width=12, command=self.write).grid(row=7, column=1, sticky=W)
-        Label(self.win, text="To:", bg="white", fg="black", font="none 12 bold").grid(row=8, column=0, sticky=W)
+        Label(self.win, text="To:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=8, column=0, sticky=W)
         self.user = Entry(self.win, width=40, bg="white")
         self.user.grid(row=9, column=0, sticky=W)
         Button(self.win, text="Send private", width=12, command=self.write_to).grid(row=9, column=1, sticky=W)
 
-        Label(self.win, text="Server File Name:", bg="white", fg="black", font="none 12 bold").grid(row=10, column=0,
-                                                                                                    sticky=W)
+        Label(self.win, text="Server File Name:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=0,
+                                                                                                  sticky=W)
         self.file = Entry(self.win, width=40, bg="white")
         self.file.grid(row=11, column=0, sticky=W)
-        Label(self.win, text="Save as:", bg="white", fg="black", font="none 12 bold").grid(row=10, column=1,
-                                                                                           sticky=W)
+        Label(self.win, text="Save as:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=1, sticky=W)
         self.file_save = Entry(self.win, width=40, bg="white")
         self.file_save.grid(row=11, column=1, sticky=W)
         Button(self.win, text="Download", width=12, command=self.download).grid(row=11, column=2, sticky=W)
 
-        Button(self.win, text="Log Out", width=12, command=self.stop).grid(row=12, column=0, sticky=W)
+        Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=12,
+                                                                                                 column=0, sticky=W)
         self.gui_done = True
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.win.mainloop()
+
+    def show_file(self):
+        try:
+            message = "show_file1234"
+            self.s.send(message.encode())
+        except:
+            pass
 
     def download(self):
         try:
