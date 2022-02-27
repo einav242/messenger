@@ -123,22 +123,23 @@ class server:
 
     def send_file(self):
         while self.running:
-            while self.running:
-                try:
-                    msg, address = self.soc.recvfrom(2048)
-                    file = msg.decode().split()[1]
-                    name = msg.decode().split()[0]
-                    for n in self.nicknames:
-                        i = str(n.split(":")[0])
-                        if i == name:
-                            index = self.nicknames.index(n)
-                            person = self.clients[index]
-                            break
+            try:
+                msg, address = self.soc.recvfrom(2048)
+                file = msg.decode().split()[1]
+                name = msg.decode().split()[0]
+                for n in self.nicknames:
+                    i = str(n.split(":")[0])
+                    if i == name:
+                        index = self.nicknames.index(n)
+                        person = self.clients[index]
+                        break
+                files = os.listdir()
+                if file in files:
                     with open(file, "rb") as f:
                         file_size = os.path.getsize(file)
-                        print(file_size)
                         if file_size < 64000:
-                            self.soc.sendto(str(file_size).encode(), address)
+                            m = "exist"+" " + str(file_size)
+                            self.soc.sendto(m.encode(), address)
                             buffer = f.read(256)
                             self.soc.sendto(buffer, address)
                             total_sent = len(buffer)
@@ -146,14 +147,18 @@ class server:
                                 buffer = f.read(256)
                                 self.soc.sendto(buffer, address)
                                 total_sent += len(buffer)
-                            print(buffer.decode())
                             b = "finish download the last byte is: " + buffer.decode() + "\n"
                             person.send(b.encode())
                         else:
                             m = "the file is too large"
-                            person.send(b.encode())
-                except:
-                    break
+                            person.send(m.encode())
+                else:
+                    m1="not"
+                    self.soc.sendto(m1.encode(), address)
+                    m = "the file does not exist\n"
+                    person.send(m.encode())
+            except:
+                break
 
     def gui_loop(self):
         self.window = Tk()
@@ -168,11 +173,6 @@ class server:
         self.window.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.window.mainloop()
-
-    def list_files(self):
-        files = os.listdir()
-        for f in files:
-            print(f)
 
     def log_out(self):
         self.running = False

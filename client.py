@@ -82,7 +82,6 @@ class client:
     def clear(self):
         self.my_progress.stop()
         self.my_label.config(text="0%")
-        self.my_progress['value'] = 0
 
     def show_file(self):
         try:
@@ -98,19 +97,23 @@ class client:
             file_save = self.file_save.get()
             self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
             size, address = self.soc.recvfrom(2048)
-            file_size = int(size)
-            with open(file_save, "wb") as f:
-                total_recv = 0
-                while total_recv < file_size:
-                    buffer, address = self.soc.recvfrom(256)
-                    f.write(buffer)
-                    total_recv += len(buffer)
-                    rate = int((total_recv / file_size) * 100)
-                    self.my_progress['value'] = rate
-                    self.my_label.config(text=str(self.my_progress['value']) + "%")
-            self.file.delete(0, END)
-            self.file_save.delete(0, END)
-            self.soc.close()
+            if size.decode().split()[0] == "exist":
+                file_size = int(size.decode().split()[1])
+                with open(file_save, "wb") as f:
+                    total_recv = 0
+                    while total_recv < file_size:
+                        buffer, address = self.soc.recvfrom(256)
+                        f.write(buffer)
+                        total_recv += len(buffer)
+                        rate = int((total_recv / file_size) * 100)
+                        self.my_progress['value'] = rate
+                        self.my_label.config(text=str(self.my_progress['value']) + "%")
+                self.file.delete(0, END)
+                self.file_save.delete(0, END)
+                self.soc.close()
+            # else:
+            #     self.clear
+            #     self.soc.close()
         except:
             pass
 
