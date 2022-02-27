@@ -2,7 +2,8 @@ import socket
 import threading
 from tkinter import *
 import tkinter.scrolledtext
-from tkinter import simpledialog
+from tkinter import simpledialog, ttk
+import time
 
 
 class client:
@@ -61,13 +62,27 @@ class client:
         self.file_save.grid(row=11, column=1, sticky=W)
         Button(self.win, text="Download", width=12, command=self.download).grid(row=11, column=2, sticky=W)
 
-        Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=12,
-                                                                                                 column=0, sticky=W)
+        Button(self.win, text=" New Download", width=12, command=self.clear).grid(row=12, column=2, sticky=W)
+
+        Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=13, column=0,
+                                                                                                 sticky=W)
+
+        self.my_progress = ttk.Progressbar(self.win, orient=HORIZONTAL, length=300, mode='determinate')
+        self.my_progress.grid(row=12, column=0, sticky=W)
+
+        self.my_label = Label(self.win, text="0%", bg="#6F8EB1", fg="black", font="Consolas")
+        self.my_label.grid(row=12, column=0, sticky=W)
+
         self.gui_done = True
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
 
         self.win.mainloop()
+
+    def clear(self):
+        self.my_progress.stop()
+        self.my_label.config(text="0%")
+        self.my_progress['value'] = 0
 
     def show_file(self):
         try:
@@ -79,7 +94,7 @@ class client:
     def download(self):
         try:
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            message = self.nickname+" "+self.file.get()
+            message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
             self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
             size, address = self.soc.recvfrom(2048)
@@ -90,8 +105,11 @@ class client:
                     buffer, address = self.soc.recvfrom(256)
                     f.write(buffer)
                     total_recv += len(buffer)
+                    rate = int((total_recv / file_size) * 100)
+                    self.my_progress['value'] = rate
+                    self.my_label.config(text=str(self.my_progress['value']) + "%")
             self.file.delete(0, END)
-            self.file_save.delete(0,END)
+            self.file_save.delete(0, END)
             self.soc.close()
         except:
             pass

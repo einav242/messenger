@@ -128,24 +128,30 @@ class server:
                     msg, address = self.soc.recvfrom(2048)
                     file = msg.decode().split()[1]
                     name = msg.decode().split()[0]
-                    with open(file, "rb") as f:
-                        file_size = os.path.getsize(file)
-                        self.soc.sendto(str(file_size).encode(), address)
-                        buffer = f.read(256)
-                        self.soc.sendto(buffer, address)
-                        total_sent = len(buffer)
-                        while total_sent < file_size:
-                            buffer = f.read(256)
-                            self.soc.sendto(buffer, address)
-                            total_sent += len(buffer)
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
                         if i == name:
                             index = self.nicknames.index(n)
                             person = self.clients[index]
+                            break
+                    with open(file, "rb") as f:
+                        file_size = os.path.getsize(file)
+                        print(file_size)
+                        if file_size < 64000:
+                            self.soc.sendto(str(file_size).encode(), address)
+                            buffer = f.read(256)
+                            self.soc.sendto(buffer, address)
+                            total_sent = len(buffer)
+                            while total_sent < file_size:
+                                buffer = f.read(256)
+                                self.soc.sendto(buffer, address)
+                                total_sent += len(buffer)
+                            print(buffer.decode())
                             b = "finish download the last byte is: " + buffer.decode() + "\n"
                             person.send(b.encode())
-                            break
+                        else:
+                            m = "the file is too large"
+                            person.send(b.encode())
                 except:
                     break
 
