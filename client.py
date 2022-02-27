@@ -68,21 +68,21 @@ class client:
         self.win.mainloop()
 
     def download(self):
-        try:
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            # self.soc.connect(("127.0.0.1", 1234))
-            message = self.file.get()
-            file_save = self.file_save.get()
-            self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
-            try:
-                size, address = self.soc.recvfrom(2048)
-                print(size.decode())
-            except:
-                pass
-            self.file.delete(0, END)
-            self.soc.close()
-        except:
-            pass
+        self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        message = self.file.get()
+        file_save = self.file_save.get()
+        self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
+        size, address = self.soc.recvfrom(2048)
+        file_size = int(size)
+        with open(file_save, "wb") as f:
+            total_recv = 0
+            while total_recv < file_size:
+                buffer, address = self.soc.recvfrom(256)
+                f.write(buffer)
+                total_recv += len(buffer)
+        self.file.delete(0, END)
+        self.file_save.delete(0,END)
+        self.soc.close()
 
     def user_list(self):
         message = "send1234"

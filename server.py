@@ -118,9 +118,17 @@ class server:
         while self.running:
             try:
                 file, address = self.soc.recvfrom(2048)
-                # with open(file.decode(), "rb") as f:
-                #     file_size = os.path.getsize(file.decode())
-                self.soc.sendto(str(15).encode(), address)
+                with open(file.decode(), "rb") as f:
+                    file_size = os.path.getsize(file.decode())
+                    self.soc.sendto(str(file_size).encode(), address)
+                    buffer = f.read(256)
+                    self.soc.sendto(buffer, address)
+                    total_sent = len(buffer)
+                    while total_sent < file_size:
+                        buffer = f.read(256)
+                        self.soc.sendto(buffer, address)
+                        total_sent += len(buffer)
+
             except:
                 break
 
