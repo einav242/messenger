@@ -95,22 +95,23 @@ class client:
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
-            self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
-            size, address = self.soc.recvfrom(2048)
-            if size.decode().split()[0] == "exist":
-                file_size = int(size.decode().split()[1])
-                with open(file_save, "wb") as f:
-                    total_recv = 0
-                    while total_recv < file_size:
-                        buffer, address = self.soc.recvfrom(256)
-                        f.write(buffer)
-                        total_recv += len(buffer)
-                        rate = int((total_recv / file_size) * 100)
-                        self.my_progress['value'] = rate
-                        self.my_label.config(text=str(self.my_progress['value']) + "%")
-                self.file.delete(0, END)
-                self.file_save.delete(0, END)
-                self.soc.close()
+            if file_save != "" and self.file.get() != "":
+                self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
+                size, address = self.soc.recvfrom(2048)
+                if size.decode().split()[0] == "exist":
+                    file_size = int(size.decode().split()[1])
+                    with open(file_save, "wb") as f:
+                        total_recv = 0
+                        while total_recv < file_size:
+                            buffer, address = self.soc.recvfrom(256)
+                            f.write(buffer)
+                            total_recv += len(buffer)
+                            rate = int((total_recv / file_size) * 100)
+                            self.my_progress['value'] = rate
+                            self.my_label.config(text=str(self.my_progress['value']) + "%")
+                    self.file.delete(0, END)
+                    self.file_save.delete(0, END)
+                    self.soc.close()
             # else:
             #     self.clear
             #     self.soc.close()
