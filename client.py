@@ -69,16 +69,15 @@ class client:
 
     def download(self):
         try:
-            self.soc = socket.socket()
-            self.soc.connect(("127.0.0.1", 1234))
+            self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            # self.soc.connect(("127.0.0.1", 1234))
             message = self.file.get()
             file_save = self.file_save.get()
-            self.soc.send(message.encode())
+            self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
             self.file.delete(0, END)
             self.soc.close()
         except:
             pass
-
 
     def user_list(self):
         message = "send1234"

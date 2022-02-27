@@ -14,9 +14,8 @@ class server:
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
-        self.soc = socket.socket()
+        self.soc = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.soc.bind((HOST, 1234))
-        self.soc.listen(15)
         self.server.listen(15)
         self.clients = []
         self.nicknames = []
@@ -118,9 +117,8 @@ class server:
     def send_file(self):
         while self.running:
             try:
-                client, address = self.soc.accept()
-                nickname = client.recv(1024)
-                print(nickname.decode())
+                client, address = self.soc.recvfrom(2048)
+                print(client.decode())
             except:
                 break
 
@@ -141,15 +139,15 @@ class server:
     def log_out(self):
         self.running = False
         self.window.destroy()
-        self.server.close()
         self.soc.close()
+        self.server.close()
         exit(0)
 
     def stop(self):
         self.running = False
         self.window.destroy()
-        self.server.close()
         self.soc.close()
+        self.server.close()
         exit(0)
 
 
