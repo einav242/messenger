@@ -14,7 +14,7 @@ class server:
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
-        self.soc = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.soc.bind((HOST, 1234))
         self.server.listen(15)
         self.clients = []
@@ -117,8 +117,10 @@ class server:
     def send_file(self):
         while self.running:
             try:
-                client, address = self.soc.recvfrom(2048)
-                print(client.decode())
+                file, address = self.soc.recvfrom(2048)
+                # with open(file.decode(), "rb") as f:
+                #     file_size = os.path.getsize(file.decode())
+                self.soc.sendto(str(15).encode(), address)
             except:
                 break
 

@@ -74,6 +74,11 @@ class client:
             message = self.file.get()
             file_save = self.file_save.get()
             self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
+            try:
+                size, address = self.soc.recvfrom(2048)
+                print(size.decode())
+            except:
+                pass
             self.file.delete(0, END)
             self.soc.close()
         except:
