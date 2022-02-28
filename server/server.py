@@ -18,7 +18,6 @@ class server:
         self.server.bind((HOST, PORT))
         self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.soc.bind((HOST, 1234))
-        # self.soc.settimeout(0.001)
         self.server.listen(15)
         self.clients = []
         self.nicknames = []
