@@ -1,9 +1,11 @@
 import socket
-import select
 import threading
 import tkinter
 from tkinter import *
 import os
+import time
+import hashlib
+import pickle
 
 HOST = '127.0.0.1'
 PORT = 9090
@@ -16,6 +18,7 @@ class server:
         self.server.bind((HOST, PORT))
         self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.soc.bind((HOST, 1234))
+        # self.soc.settimeout(0.001)
         self.server.listen(15)
         self.clients = []
         self.nicknames = []
@@ -124,7 +127,11 @@ class server:
     def send_file(self):
         while self.running:
             try:
-                msg, address = self.soc.recvfrom(2048)
+                msg, address = self.soc.recvfrom(4096)
+                base = 1
+                nextSeqnum = 1
+                windowSize = 7
+                window = []
                 file = msg.decode().split()[1]
                 name = msg.decode().split()[0]
                 for n in self.nicknames:
@@ -135,23 +142,51 @@ class server:
                         break
                 files = os.listdir()
                 if file in files:
-                    with open(file, "rb") as f:
-                        file_size = os.path.getsize(file)
-                        if file_size < 64000:
-                            m = "exist" + " " + str(file_size)
-                            self.soc.sendto(m.encode(), address)
-                            buffer = f.read(256)
-                            self.soc.sendto(buffer, address)
-                            total_sent = len(buffer)
-                            while total_sent < file_size:
-                                buffer = f.read(256)
-                                self.soc.sendto(buffer, address)
-                                total_sent += len(buffer)
-                            b = "finish download the last byte is: " + buffer.decode() + "\n"
-                            person.send(b.encode())
-                        else:
-                            m = "the file is too large"
-                            person.send(m.encode())
+                    file_size = os.path.getsize(file)
+                    m = "exist" + " " + str(file_size)
+                    self.soc.sendto(m.encode(), address)
+                    if file_size < 64000:
+                        f = open(file, 'rb')
+                        data = f.read(500)
+                        done = False
+                        lastackreceived = time.time()
+                        while not done or window:
+                            if (nextSeqnum < base + windowSize) and not done:
+                                sndpkt = []
+                                sndpkt.append(nextSeqnum)
+                                sndpkt.append(data)
+                                h = hashlib.md5()
+                                h.update(pickle.dumps(sndpkt))
+                                sndpkt.append(h.digest())
+                                self.soc.sendto(pickle.dumps(sndpkt), address)
+                                print("Sent data", nextSeqnum)
+                                nextSeqnum = nextSeqnum + 1
+                                if not data:
+                                    done = True
+                                window.append(sndpkt)
+                                data = f.read(500)
+                            try:
+                                packet, serverAddress = self.soc.recvfrom(4096)
+                                rcvpkt = []
+                                rcvpkt = pickle.loads(packet)
+                                c = rcvpkt[-1]
+                                del rcvpkt[-1]
+                                h = hashlib.md5()
+                                h.update(pickle.dumps(rcvpkt))
+                                if c == h.digest():
+                                    print("Received ack for", rcvpkt[0])
+                                    while rcvpkt[0] > base and window:
+                                        lastackreceived = time.time()
+                                        del window[0]
+                                        base = base + 1
+                                else:
+                                    print("error detected")
+                            except:
+                                if time.time() - lastackreceived > 0.01:
+                                    for i in window:
+                                        self.soc.sendto(pickle.dumps(i), address)
+                    # f.close()
+                    print("connection closed")
                 else:
                     m1 = "not"
                     self.soc.sendto(m1.encode(), address)

@@ -1,3 +1,5 @@
+import hashlib
+import pickle
 import socket
 import threading
 from tkinter import *
@@ -93,27 +95,80 @@ class client:
     def download(self):
         try:
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.soc.settimeout(3)
             message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
+            print("Ready to serve")
+            expectedseqnum = 1
+            f = open(file_save, "wb")
+            endoffile = False
+            lastpktreceived = time.time()
+            starttime = time.time()
             if file_save != "" and self.file.get() != "":
                 self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
-                size, address = self.soc.recvfrom(2048)
+                size, address = self.soc.recvfrom(4096)
                 if size.decode().split()[0] == "exist":
-                    file_size = int(size.decode().split()[1])
-                    with open(file_save, "wb") as f:
-                        total_recv = 0
-                        while total_recv < file_size:
-                            buffer, address = self.soc.recvfrom(256)
-                            f.write(buffer)
-                            total_recv += len(buffer)
-                            rate = int((total_recv / file_size) * 100)
-                            self.my_progress['value'] = rate
-                            self.my_label.config(text=str(self.my_progress['value']) + "%")
-                    self.file.delete(0, END)
-                    self.file_save.delete(0, END)
-                    self.soc.close()
+                    while not endoffile:
+                        try:
+                            self.rcvpkt = []
+                            packet, clientAddress = self.soc.recvfrom(4096)
+                            self.rcvpkt = pickle.loads(packet)
+                            c = self.rcvpkt[-1]
+                            del self.rcvpkt[-1]
+                            h = hashlib.md5()
+                            h.update(pickle.dumps(self.rcvpkt))
+                            if c == h.digest():
+                                if self.rcvpkt[0] == expectedseqnum:
+                                    print("Received inorder", expectedseqnum)
+                                    if self.rcvpkt[1]:
+                                        f.write(self.rcvpkt[1])
+                                    else:
+                                        endoffile = True
+                                    expectedseqnum = expectedseqnum + 1
+                                    sndpkt = []
+                                    sndpkt.append(expectedseqnum)
+                                    h = hashlib.md5()
+                                    h.update(pickle.dumps(sndpkt))
+                                    sndpkt.append(h.digest())
+                                    self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
+                                    print("New Ack", expectedseqnum)
+                                else:
+                                    print("Received out of order", self.rcvpkt[0])
+                                    sndpkt = []
+                                    sndpkt.append(expectedseqnum)
+                                    h = hashlib.md5()
+                                    h.update(pickle.dumps(sndpkt))
+                                    sndpkt.append(h.digest())
+                                    self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
+                                    print("Ack", expectedseqnum)
+                            else:
+                                print("error detected")
+                        except:
+                            if endoffile:
+                                if time.time() - lastpktreceived > 3:
+                                    break
+
+                    endtime = time.time()
+
+                    f.close()
+                    print('FILE TRANFER SUCCESSFUL')
+                    print("TIME TAKEN ", str(endtime - starttime))
+
+                    # file_size = int(size.decode().split()[1])
+                    # with open(file_save, "wb") as f:
+                    #     total_recv = 0
+                    #     while total_recv < file_size:
+                    #         buffer, address = self.soc.recvfrom(256)
+                    #         f.write(buffer)
+                    #         total_recv += len(buffer)
+                    #         rate = int((total_recv / file_size) * 100)
+                    #         self.my_progress['value'] = rate
+                    #         self.my_label.config(text=str(self.my_progress['value']) + "%")
         except:
             pass
+        self.file.delete(0, END)
+        self.file_save.delete(0, END)
+        self.soc.close()
 
     def user_list(self):
         message = "send1234"
