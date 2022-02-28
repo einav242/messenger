@@ -176,6 +176,7 @@ class server:
                                     print("Received ack for", rcvpkt[0])
                                     while rcvpkt[0] > base and window:
                                         lastackreceived = time.time()
+                                        temp = window[0]
                                         del window[0]
                                         base = base + 1
                                 else:
@@ -184,8 +185,10 @@ class server:
                                 if time.time() - lastackreceived > 0.01:
                                     for i in window:
                                         self.soc.sendto(pickle.dumps(i), address)
-                    # f.close()
+                    f.close()
                     print("connection closed")
+                    b = "finish download the last byte is: " + str(temp[-1]) + "\n"
+                    person.send(b.encode())
                 else:
                     m1 = "not"
                     self.soc.sendto(m1.encode(), address)

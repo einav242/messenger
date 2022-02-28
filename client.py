@@ -94,11 +94,11 @@ class client:
 
     def download(self):
         try:
+            temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.soc.settimeout(3)
             message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
-            print("Ready to serve")
             expectedseqnum = 1
             f = open(file_save, "wb")
             endoffile = False
@@ -108,6 +108,7 @@ class client:
                 self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
                 size, address = self.soc.recvfrom(4096)
                 if size.decode().split()[0] == "exist":
+                    total_size = int(size.decode().split()[1])
                     while not endoffile:
                         try:
                             self.rcvpkt = []
@@ -118,6 +119,12 @@ class client:
                             h = hashlib.md5()
                             h.update(pickle.dumps(self.rcvpkt))
                             if c == h.digest():
+                                temp += (len(self.rcvpkt[1]))
+                                rate = int((temp / total_size) * 100)
+                                self.my_progress['value'] = rate
+                                self.my_label.config(text=str(rate) + "%")
+                                time.sleep(0.001)
+                                self.win.update()
                                 if self.rcvpkt[0] == expectedseqnum:
                                     print("Received inorder", expectedseqnum)
                                     if self.rcvpkt[1]:
@@ -154,16 +161,7 @@ class client:
                     print('FILE TRANFER SUCCESSFUL')
                     print("TIME TAKEN ", str(endtime - starttime))
 
-                    # file_size = int(size.decode().split()[1])
-                    # with open(file_save, "wb") as f:
-                    #     total_recv = 0
-                    #     while total_recv < file_size:
-                    #         buffer, address = self.soc.recvfrom(256)
-                    #         f.write(buffer)
-                    #         total_recv += len(buffer)
-                    #         rate = int((total_recv / file_size) * 100)
-                    #         self.my_progress['value'] = rate
-                    #         self.my_label.config(text=str(self.my_progress['value']) + "%")
+
         except:
             pass
         self.file.delete(0, END)
