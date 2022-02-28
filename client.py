@@ -35,7 +35,7 @@ class client:
 
         Button(self.win, text="start", width=12, command=self.write, fg="black", bg="green").grid(row=0, column=0,
                                                                                                   sticky=W)
-        Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getpeername()), bg="#6F8EB1",
+        Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getsockname()), bg="#6F8EB1",
               fg="black", font="Helvetica 11 bold").grid(row=1, column=0, sticky=W)
 
         Button(self.win, text="Show Online", width=12, command=self.user_list).grid(row=0, column=2, sticky=W)
