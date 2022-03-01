@@ -1,15 +1,15 @@
 # **:speech_balloon: Final Project - Messenger**
 
 ## This project is divided into 3️⃣ parts:
-- **Part 1** – We have built a primitive instant messaging system (similar to messenger) based on communication.
-- **Part 2** – For the same Class A system, we added a new layer (additional code) to transfer files over UDP.
+- **Part 1** – We built a primitive instant messaging system (similar to messenger) based on communication.
+- **Part 2** – To the same system from part 1, we added a new layer (additional code) to transfer files over UDP.
 - **Part 3** – We answered 9 questions (pdf attached) to the assignment.
 
 
-### **For the purpose of implementing the project, we created a Server and a Client when:** 
+### **To implement the project, we created a Server and a Client when:** 
 The server initializes itself and "listens".
-The server runs on a particular IP server and listens to clients in a particular port known to sample clients 50000,
-allowing it to connect to multiple clients at once (at least 5).
+The server runs on a specific IP server and listens to clients in a specific port that known to sample clients for example: 50000,
+when he allowing to connect to multiple clients at once (at least 5).
 After a client disconnects the free port is returned to being a free resource.
 
 Each customer can send a message to all connected chat and a private message to a specific connected person while monitoring the transfer using a TCP connection.
