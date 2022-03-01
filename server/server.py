@@ -203,8 +203,8 @@ class server:
                                     soc.sendto(pickle.dumps(i), address)
                 f.close()
                 print("connection closed")
-                b = "finish download the last byte is: " + str(temp[-1]) + "\n"
-                person.send(b.encode())
+                # b = "finish download the last byte is: " + str(temp[-1]) + "\n"
+                # person.send(b.encode())
                 soc.close()
 
             else:

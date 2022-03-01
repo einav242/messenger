@@ -102,6 +102,7 @@ class client:
 
     def download(self):
         try:
+            temp2=None
             temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.soc.settimeout(3)
@@ -137,6 +138,10 @@ class client:
                                     print("Received inorder", expectedseqnum)
                                     if self.rcvpkt[1]:
                                         f.write(self.rcvpkt[1])
+                                        try:
+                                            temp2=self.rcvpkt[1][-1]
+                                        except:
+                                            pass
                                     else:
                                         endoffile = True
                                     expectedseqnum = expectedseqnum + 1
@@ -172,9 +177,19 @@ class client:
 
         except:
             pass
+        m = "finish download the last byte is: " + str(temp2)
+        print(m)
+        self.input_area.config(state='normal')
+        self.input_area.insert(END, m)
+        self.input_area.yview('end')
+        self.input_area.config(state='disabled')
         self.file.delete(0, END)
         self.file_save.delete(0, END)
         self.soc.close()
+
+
+
+
 
     def user_list(self):
         message = "send1234"
@@ -213,13 +228,7 @@ class client:
 
         exit(0)
 
-    def start(self):
-        message = self.s.recv(1024)
 
-        self.users_area.config(state='normal')
-        self.users_area.insert('end', message)
-        self.users_area.yview('end')
-        self.users_area.config(state='disabled')
 
     def receive(self):
         while self.running:
