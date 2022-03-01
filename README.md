@@ -1,4 +1,4 @@
-# **Final Project - Messenger**
+# **:speech_balloon: Final Project - Messenger**
 
 ## This project is divided into 3️⃣ parts:
 - **Part 1** – We have built a primitive instant messaging system (similar to messenger) based on communication.
@@ -21,7 +21,7 @@ it is possible that while waiting for permission to continue downloading from on
 the other client requests and starts receiving the file at the same time.
 
 
-**The client can perform the following operation:**
+**The client :busts_in_silhouette: can perform the following operation:**
 1. connect to server 
 2. disconnect from server
 3. Send a message to another customer
@@ -31,7 +31,7 @@ the other client requests and starts receiving the file at the same time.
 7. Send a request to download a file from the server
 8. download file from server
 
-Also, if a new customer has joined or disconnected an existing customer, an appropriate message must be sent to all participants.
+:bulb: Also, if a new customer has joined or disconnected an existing customer, an appropriate message must be sent to all participants.
 
 It can be assumed that:
 1. The number of messages per customer should not exceed 100 messages.
