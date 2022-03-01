@@ -10,6 +10,8 @@ import time
 
 class client:
     def __init__(self, host, port):
+        self.port=None
+        self.bool=False
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((host, port))
         self.temp = tkinter.Tk()
@@ -217,7 +219,15 @@ class client:
         while self.running:
             try:
                 message = self.s.recv(1024)
-                if message == 'NICK':
+                try:
+                    if self.bool==False:
+                        self.port = int(message.split()[1])
+                        print(self.port)
+                        self.bool=True
+                except:
+                    pass
+                if message.split()[0] == "NICK":
+                    self.port=message.split()[1]
                     self.s.send(self.nickname.encode())
                 else:
                     if self.gui_done:
@@ -225,6 +235,7 @@ class client:
                         self.input_area.insert(END, message)
                         self.input_area.yview('end')
                         self.input_area.config(state='disabled')
+
 
                         # self.text_area.config(state='normal')
                         # self.text_area.insert('end', message)

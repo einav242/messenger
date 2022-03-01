@@ -13,6 +13,7 @@ PORT = 9090
 
 class server:
     def __init__(self):
+        self.port = 5000
         self.count = 2
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((HOST, PORT))
@@ -21,6 +22,7 @@ class server:
         self.server.listen(15)
         self.clients = []
         self.nicknames = []
+        self.udp_port = dict()
         self.running = True
         try:
             gui_thread = threading.Thread(target=self.gui_loop)
@@ -49,10 +51,15 @@ class server:
             try:
                 client, address = self.server.accept()
 
-                client.send("NICK".encode('utf-8'))
+                m = "NICK" + " " + str(self.port)
+                client.send(m.encode('utf-8'))
                 nickname = client.recv(1024)
 
                 name = nickname.decode().split(":")[0]
+
+                self.udp_port[name] = self.port
+                self.port += 1
+                print(self.udp_port)
 
                 self.nicknames.append(name)
 
@@ -114,6 +121,7 @@ class server:
                 self.clients.remove(client)
                 client.close()
                 nickname = self.nicknames[index]
+                del self.udp_port[nickname]
                 self.nicknames.remove(nickname)
                 name = nickname.split()[0]
                 m = f"{name} leave\n"
