@@ -10,8 +10,8 @@ import time
 
 class client:
     def __init__(self, host, port):
-        self.port=None
-        self.bool=False
+        self.port = None
+        self.bool = False
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((host, port))
         self.temp = tkinter.Tk()
@@ -64,7 +64,7 @@ class client:
         Label(self.win, text="Save as:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=1, sticky=W)
         self.file_save = Entry(self.win, width=40, bg="white")
         self.file_save.grid(row=11, column=1, sticky=W)
-        Button(self.win, text="Download", width=12, command=self.download).grid(row=11, column=2, sticky=W)
+        Button(self.win, text="Download", width=12, command=self.ask_download).grid(row=11, column=2, sticky=W)
 
         Button(self.win, text=" New Download", width=12, command=self.clear).grid(row=12, column=2, sticky=W)
 
@@ -94,6 +94,12 @@ class client:
         except:
             pass
 
+    def ask_download(self):
+        if self.file_save.get() != "" and self.file.get() != "":
+            m = "DOWNLOAD_ASK" + " " + self.file.get()+" "+self.nickname
+            self.s.send(m.encode())
+            self.download()
+
     def download(self):
         try:
             temp = 0
@@ -107,7 +113,7 @@ class client:
             lastpktreceived = time.time()
             starttime = time.time()
             if file_save != "" and self.file.get() != "":
-                self.soc.sendto(message.encode(), ("127.0.0.1", 1234))
+                self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
                 size, address = self.soc.recvfrom(4096)
                 if size.decode().split()[0] == "exist":
                     total_size = int(size.decode().split()[1])
@@ -220,14 +226,14 @@ class client:
             try:
                 message = self.s.recv(1024)
                 try:
-                    if self.bool==False:
+                    if self.bool == False:
                         self.port = int(message.split()[1])
                         print(self.port)
-                        self.bool=True
+                        self.bool = True
                 except:
                     pass
                 if message.split()[0] == "NICK":
-                    self.port=message.split()[1]
+                    self.port = message.split()[1]
                     self.s.send(self.nickname.encode())
                 else:
                     if self.gui_done:
@@ -235,7 +241,6 @@ class client:
                         self.input_area.insert(END, message)
                         self.input_area.yview('end')
                         self.input_area.config(state='disabled')
-
 
                         # self.text_area.config(state='normal')
                         # self.text_area.insert('end', message)
