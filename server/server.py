@@ -105,7 +105,7 @@ class server:
                         m = "the file " + file_name + " does not exist\n"
                         client.send(m.encode())
                 elif message.decode().split()[0] == "private":
-                    user = message.decode().split()[1]
+                    user = message.decode().split()[3]
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
                         if i == user:
@@ -151,12 +151,6 @@ class server:
             nextSeqnum = 1
             windowSize = 7
             window = []
-            for n in self.nicknames:
-                i = str(n.split(":")[0])
-                if i == name:
-                    index = self.nicknames.index(n)
-                    person = self.clients[index]
-                    break
             files = os.listdir()
             if file_name in files:
                 file_size = os.path.getsize(file_name)
@@ -194,7 +188,6 @@ class server:
                                 print("Received ack for", rcvpkt[0])
                                 while rcvpkt[0] > base and window:
                                     lastackreceived = time.time()
-                                    temp = window[0]
                                     del window[0]
                                     base = base + 1
                             else:
@@ -205,8 +198,6 @@ class server:
                                     soc.sendto(pickle.dumps(i), address)
                 f.close()
                 print("connection closed")
-                # b = "finish download the last byte is: " + str(temp[-1]) + "\n"
-                # person.send(b.encode())
                 soc.close()
 
             else:

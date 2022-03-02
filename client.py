@@ -191,7 +191,7 @@ class client:
 
     def write_to(self):
         name = self.user.get()
-        message = f"private {name} {self.nickname}: {self.msg.get()}" + "\n"
+        message = f"private message to {name}\n {self.nickname}: {self.msg.get()}" + "\n"
         try:
             self.s.send(message.encode())
             self.msg.delete(0, END)
