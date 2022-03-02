@@ -96,13 +96,13 @@ class client:
 
     def ask_download(self):
         if self.file_save.get() != "" and self.file.get() != "":
-            m = "DOWNLOAD_ASK" + " " + self.file.get()+" "+self.nickname
+            m = "DOWNLOAD_ASK" + " " + self.file.get() + " " + self.nickname
             self.s.send(m.encode())
             self.download()
 
     def download(self):
         try:
-            temp2=None
+            temp2 = None
             temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.soc.settimeout(3)
@@ -139,7 +139,7 @@ class client:
                                     if self.rcvpkt[1]:
                                         f.write(self.rcvpkt[1])
                                         try:
-                                            temp2=self.rcvpkt[1][-1]
+                                            temp2 = self.rcvpkt[1][-1]
                                         except:
                                             pass
                                     else:
@@ -173,23 +173,20 @@ class client:
                     f.close()
                     print('FILE TRANFER SUCCESSFUL')
                     print("TIME TAKEN ", str(endtime - starttime))
+                    m = "finish download " + self.file.get() + " the last byte is: " + str(temp2)+"\n" + "Time Taken: " + \
+                        str(endtime - starttime) + "\n"
+                    self.input_area.config(state='normal')
+                    self.input_area.insert(END, m)
+                    self.input_area.yview('end')
+                    self.input_area.config(state='disabled')
 
 
         except:
             pass
-        m = "finish download the last byte is: " + str(temp2)
-        print(m)
-        self.input_area.config(state='normal')
-        self.input_area.insert(END, m)
-        self.input_area.yview('end')
-        self.input_area.config(state='disabled')
+
         self.file.delete(0, END)
         self.file_save.delete(0, END)
         self.soc.close()
-
-
-
-
 
     def user_list(self):
         message = "send1234"
@@ -197,7 +194,7 @@ class client:
 
     def write_to(self):
         name = self.user.get()
-        message = f"private {name} {self.nickname}: {self.msg.get()}" + "\n"
+        message = f"private message to {name}\n {self.nickname}: {self.msg.get()}" + "\n"
         try:
             self.s.send(message.encode())
             self.msg.delete(0, END)
@@ -227,8 +224,6 @@ class client:
             pass
 
         exit(0)
-
-
 
     def receive(self):
         while self.running:
