@@ -94,13 +94,15 @@ class server:
                     name = message.decode().split()[2]
                     files = os.listdir()
                     if file_name in files:
+                        m="start download the file..."
+                        client.send(m.encode())
                         try:
                             file_thread = threading.Thread(target=self.send_file, args=(file_name, name,))
                             file_thread.start()
                         except:
                             pass
                     else:
-                        m = "the file does not exist\n"
+                        m = "the file " + file_name + " does not exist\n"
                         client.send(m.encode())
                 elif message.decode().split()[0] == "private":
                     user = message.decode().split()[1]
