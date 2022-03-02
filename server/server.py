@@ -100,10 +100,10 @@ class server:
                         except:
                             pass
                     else:
-                        m = "the file "+ file_name+" does not exist\n"
+                        m = "the file does not exist\n"
                         client.send(m.encode())
                 elif message.decode().split()[0] == "private":
-                    user = message.decode().split()[3]
+                    user = message.decode().split()[1]
                     for n in self.nicknames:
                         i = str(n.split(":")[0])
                         if i == user:
