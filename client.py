@@ -9,20 +9,23 @@ import time
 
 
 class client:
-    def __init__(self, host, port):
-        self.port = None
-        self.bool = False
-        self.wait = False
-        self.stop_download = False
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((host, port))
-        self.temp = tkinter.Tk()
-        self.temp.withdraw()
-        self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.temp)
-        self.gui_done = False
-        self.running = True
-        gui_thread = threading.Thread(target=self.gui_loop)
-        receive_thread = threading.Thread(target=self.receive)
+    def __init__(self, host, port2):
+        try:
+            self.port = None
+            self.bool = False
+            self.wait = False
+            self.stop_download = False
+            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.s.connect((host, port2))
+            self.temp = tkinter.Tk()
+            self.temp.withdraw()
+            self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.temp)
+            self.gui_done = False
+            self.running = True
+            gui_thread = threading.Thread(target=self.gui_loop)
+            receive_thread = threading.Thread(target=self.receive)
+        except:
+            pass
         try:
             gui_thread.start()
         except:
@@ -33,61 +36,67 @@ class client:
             pass
 
     def gui_loop(self):
-        self.win = Tk()
-        self.win.title("client")
-        self.win.configure(background="#6F8EB1")
+        try:
+            self.win = Tk()
+            self.win.title("client")
+            self.win.configure(background="#6F8EB1")
 
-        Button(self.win, text="start", width=12, command=self.write, fg="black", bg="green").grid(row=0, column=0,
-                                                                                                  sticky=W)
-        Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getsockname()), bg="#6F8EB1",
-              fg="black", font="Helvetica 11 bold").grid(row=1, column=0, sticky=W)
+            Button(self.win, text="start", width=12, command=self.write, fg="black", bg="green").grid(row=0, column=0,
+                                                                                                      sticky=W)
+            Label(self.win, text="name:" + self.nickname + "  address:" + str(self.s.getsockname()), bg="#6F8EB1",
+                  fg="black", font="Helvetica 11 bold").grid(row=1, column=0, sticky=W)
 
-        Button(self.win, text="Show Online", width=12, command=self.user_list).grid(row=0, column=2, sticky=W)
-        Button(self.win, text="Show Server Files", width=12, command=self.show_file).grid(row=2, column=2, sticky=W)
+            Button(self.win, text="Show Online", width=12, command=self.user_list).grid(row=0, column=2, sticky=W)
+            Button(self.win, text="Show Server Files", width=12, command=self.show_file).grid(row=2, column=2, sticky=W)
 
-        Label(self.win, text="Chat:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=3, column=0, sticky=W)
-        self.input_area = Text(self.win, width=75, height=15, wrap=WORD, background="lightgray")
-        self.input_area.grid(row=5, column=0, columnspan=2, sticky=W)
+            Label(self.win, text="Chat:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=3, column=0, sticky=W)
+            self.input_area = Text(self.win, width=75, height=15, wrap=WORD, background="lightgray")
+            self.input_area.grid(row=5, column=0, columnspan=2, sticky=W)
 
-        Label(self.win, text="Message:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=6, column=0, sticky=W)
-        self.msg = Entry(self.win, width=40, bg="white")
-        self.msg.grid(row=7, column=0, sticky=W)
+            Label(self.win, text="Message:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=6, column=0, sticky=W)
+            self.msg = Entry(self.win, width=40, bg="white")
+            self.msg.grid(row=7, column=0, sticky=W)
 
-        Button(self.win, text="Send all", width=12, command=self.write).grid(row=7, column=1, sticky=W)
-        Label(self.win, text="To:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=8, column=0, sticky=W)
-        self.user = Entry(self.win, width=40, bg="white")
-        self.user.grid(row=9, column=0, sticky=W)
-        Button(self.win, text="Send private", width=12, command=self.write_to).grid(row=9, column=1, sticky=W)
+            Button(self.win, text="Send all", width=12, command=self.write).grid(row=7, column=1, sticky=W)
+            Label(self.win, text="To:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=8, column=0, sticky=W)
+            self.user = Entry(self.win, width=40, bg="white")
+            self.user.grid(row=9, column=0, sticky=W)
+            Button(self.win, text="Send private", width=12, command=self.write_to).grid(row=9, column=1, sticky=W)
 
-        Label(self.win, text="Server File Name:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=0,
-                                                                                                  sticky=W)
-        self.file = Entry(self.win, width=40, bg="white")
-        self.file.grid(row=11, column=0, sticky=W)
-        Label(self.win, text="Save as:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=1, sticky=W)
-        self.file_save = Entry(self.win, width=40, bg="white")
-        self.file_save.grid(row=11, column=1, sticky=W)
-        Button(self.win, text="Download", width=12, command=self.ask_download).grid(row=11, column=2, sticky=W)
+            Label(self.win, text="Server File Name:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=0,
+                                                                                                      sticky=W)
+            self.file = Entry(self.win, width=40, bg="white")
+            self.file.grid(row=11, column=0, sticky=W)
+            Label(self.win, text="Save as:", bg="#6F8EB1", fg="black", font="Consolas").grid(row=10, column=1, sticky=W)
+            self.file_save = Entry(self.win, width=40, bg="white")
+            self.file_save.grid(row=11, column=1, sticky=W)
+            Button(self.win, text="Download", width=12, command=self.ask_download).grid(row=11, column=2, sticky=W)
 
-        Button(self.win, text=" New Download", width=12, command=self.clear).grid(row=12, column=2, sticky=W)
+            Button(self.win, text=" New Download", width=12, command=self.clear).grid(row=12, column=2, sticky=W)
 
-        Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=13, column=0,
-                                                                                                 sticky=W)
+            Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=17, column=0,
+                                                                                                     sticky=W)
 
-        self.my_progress = ttk.Progressbar(self.win, orient=HORIZONTAL, length=300, mode='determinate')
-        self.my_progress.grid(row=12, column=0, sticky=W)
+            self.my_progress = ttk.Progressbar(self.win, orient=HORIZONTAL, length=300, mode='determinate')
+            self.my_progress.grid(row=12, column=0, sticky=W)
 
-        self.my_label = Label(self.win, text="0%", bg="#6F8EB1", fg="black", font="Consolas")
-        self.my_label.grid(row=12, column=0, sticky=W)
+            self.my_label = Label(self.win, text="0%", bg="#6F8EB1", fg="black", font="Consolas")
+            self.my_label.grid(row=12, column=0, sticky=W)
 
-        self.gui_done = True
+            self.gui_done = True
 
-        self.win.protocol("WM_DELETE_WINDOW", self.stop)
+            self.win.protocol("WM_DELETE_WINDOW", self.stop)
 
-        self.win.mainloop()
+            self.win.mainloop()
+        except:
+            pass
 
     def clear(self):
-        self.my_progress.stop()
-        self.my_label.config(text="0%")
+        try:
+            self.my_progress.stop()
+            self.my_label.config(text="0%")
+        except:
+            pass
 
     def show_file(self):
         try:
@@ -201,19 +210,16 @@ class client:
         yes_msg = "YES CONTINUE"
         self.s.send(yes_msg.encode())
         self.wait = False
-        try:
-            self.wait_win.destroy()
-            self.wait_win.quit()
-        except:
-            pass
+        self.temp1.destroy()
+        self.temp2.destroy()
+        self.temp3.destroy()
 
     def no_button(self):
         no_msg = "STOP DOWNLOAD!"
         self.s.send(no_msg.encode())
-        try:
-            self.wait_win.destroy()
-        except:
-            pass
+        self.temp1.destroy()
+        self.temp2.destroy()
+        self.temp3.destroy()
         self.stop_download = True
 
     def user_list(self):
@@ -223,12 +229,9 @@ class client:
     def write_to(self):
         name = self.user.get()
         message = f"private message to {name}\n {self.nickname}: {self.msg.get()}" + "\n"
-        try:
-            self.s.send(message.encode())
-            self.msg.delete(0, END)
-            self.user.delete(0, END)
-        except:
-            pass
+        self.s.send(message.encode())
+        self.msg.delete(0, END)
+        self.user.delete(0, END)
 
     def write(self):
         message = f"{self.nickname}: {self.msg.get()}" + "\n"
@@ -239,37 +242,20 @@ class client:
         self.running = False
         self.msg.destroy()
         self.s.close()
-        try:
-            self.soc.close()
-        except:
-            pass
+        self.soc.close()
         exit(0)
 
     def stop(self):
         self.running = False
         self.win.destroy()
         self.s.close()
-        try:
-            self.soc.close()
-        except:
-            pass
+        self.soc.close()
         exit(0)
-
-    def close_wait_win(self):
-        self.stop_download = True
-        no_msg = "STOP DOWNLOAD!"
-        self.s.send(no_msg.encode())
-        try:
-            self.wait_win.destroy()
-            self.wait_win.quit()
-        except:
-            pass
 
     def receive(self):
         while self.running:
             try:
                 message = self.s.recv(1024)
-                print("message: " + message.decode())
                 try:
                     if self.bool == False:
                         self.port = int(message.split()[1])
@@ -289,19 +275,18 @@ class client:
                             pass
                     elif message.decode() == "STOP AND WAIT":
                         self.wait = True
-                        self.wait_win = Tk()
-                        self.wait_win.configure(background="white")
-                        Label(self.wait_win, text="Do you want to continue?", bg="white", fg="black",
-                              font="Helvetica 11 bold").grid(row=0, column=0, sticky=W)
-                        Button(self.wait_win, text="yes", width=12, command=self.yes_button, fg="black",
-                               bg="white").grid(
-                            row=1,
-                            column=0, sticky=W)
-                        Button(self.wait_win, text="No", width=12, command=self.no_button, fg="black", bg="white").grid(
-                            row=1,
-                            column=1, sticky=W)
-                        self.wait_win.protocol("WM_DELETE_WINDOW", self.close_wait_win)
-                        self.wait_win.mainloop()
+                        try:
+                            self.temp1 = Label(self.win, text="Do you want to continue?", bg="white", fg="black",
+                                               font="Helvetica 11 bold")
+                            self.temp1.grid(row=13, column=0, sticky=W)
+                            self.temp2 = Button(self.win, text="yes", width=12, command=self.yes_button, fg="black",
+                                                bg="white")
+                            self.temp2.grid(row=14, column=0, sticky=W)
+                            self.temp3 = Button(self.win, text="No", width=12, command=self.no_button, fg="black",
+                                                bg="white")
+                            self.temp3.grid(row=14, column=1, sticky=W)
+                        except:
+                            pass
                     elif message.decode().split()[0] == "NEWPORT":
                         self.port = int(message.decode().split()[1])
                     else:
@@ -320,4 +305,7 @@ class client:
                 exit(0)
 
 
-client("127.0.0.1", 9090)
+try:
+    client("127.0.0.1", 9090)
+except:
+    pass

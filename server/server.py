@@ -13,36 +13,42 @@ PORT = 9090
 
 class server:
     def __init__(self):
-        # self.wait = False
-        # self.stop_download = False
-        self.port = 5000
-        self.count = 2
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((HOST, PORT))
-        self.server.listen(15)
-        self.clients = []
-        self.nicknames = []
-        self.udp_port = dict()
-        self.stop_download = dict()
-        self.wait = dict()
-        self.running = True
+        try:
+            self.port = 50000
+            self.count = 2
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server.bind((HOST, PORT))
+            self.server.listen(15)
+            self.clients = []
+            self.nicknames = []
+            self.udp_port = dict()
+            self.stop_download = dict()
+            self.wait = dict()
+            self.running = True
+        except:
+            pass
         try:
             gui_thread = threading.Thread(target=self.gui_loop)
             gui_thread.start()
         except:
             pass
-
-        self.receive()
+        try:
+            self.receive()
+        except:
+            pass
 
     def broadcast(self, message, non_receptors=None):
-        if non_receptors is None:
-            for client in self.clients:
-                client.send(message)
-        else:
-            for client in self.clients:
-                if client == non_receptors:
-                    continue
-                client.send(message)
+        try:
+            if non_receptors is None:
+                for client in self.clients:
+                    client.send(message)
+            else:
+                for client in self.clients:
+                    if client == non_receptors:
+                        continue
+                    client.send(message)
+        except:
+            pass
 
     def receive(self):
         while self.running:
@@ -118,13 +124,10 @@ class server:
                     if file_name in files:
                         m = "start download the file..."
                         client.send(m.encode())
-                        try:
-                            self.stop_download[nick] = False
-                            self.wait[nick] = False
-                            self.file_thread = threading.Thread(target=self.send_file, args=(file_name, name,))
-                            self.file_thread.start()
-                        except:
-                            pass
+                        self.stop_download[nick] = False
+                        self.wait[nick] = False
+                        self.file_thread = threading.Thread(target=self.send_file, args=(file_name, name,))
+                        self.file_thread.start()
                     else:
                         m = "the file " + file_name + " does not exist\n"
                         client.send(m.encode())
@@ -174,7 +177,9 @@ class server:
             print("port: " + str(port))
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             soc.bind((HOST, port))
+            print("hi2")
             msg, address = soc.recvfrom(4096)
+            print("hi5")
             base = 1
             nextSeqnum = 1
             windowSize = 7
@@ -246,30 +251,41 @@ class server:
              pass
 
     def gui_loop(self):
-        self.window = Tk()
-        self.window.title("server")
-        self.window.configure(background="white")
-        Label(self.window, text="starting sever...", bg="white", fg="black",
-              font="none 12 bold").grid(row=1, column=0, sticky=W)
-        Label(self.window, text="                                                      ", bg="white", fg="black",
-              font="none 12 bold").grid(row=1, column=1, sticky=W)
-        Button(self.window, text="LogOut", width=14, command=self.log_out).grid(row=1, column=2, sticky=W)
+        try:
+            self.window = Tk()
+            self.window.title("server")
+            self.window.configure(background="white")
+            Label(self.window, text="starting sever...", bg="white", fg="black",
+                  font="none 12 bold").grid(row=1, column=0, sticky=W)
+            Label(self.window, text="                                                      ", bg="white", fg="black",
+                  font="none 12 bold").grid(row=1, column=1, sticky=W)
+            Button(self.window, text="LogOut", width=14, command=self.log_out).grid(row=1, column=2, sticky=W)
 
-        self.window.protocol("WM_DELETE_WINDOW", self.stop)
+            self.window.protocol("WM_DELETE_WINDOW", self.stop)
 
-        self.window.mainloop()
+            self.window.mainloop()
+        except:
+            pass
 
     def log_out(self):
-        self.running = False
-        self.window.destroy()
-        self.server.close()
-        exit(0)
+        try:
+            self.running = False
+            self.window.destroy()
+            self.server.close()
+            exit(0)
+        except:
+            pass
 
     def stop(self):
-        self.running = False
-        self.window.destroy()
-        self.server.close()
-        exit(0)
+        try:
+            self.running = False
+            self.window.destroy()
+            self.server.close()
+            exit(0)
+        except:
+            pass
 
-
-server()
+try:
+    server()
+except:
+    pass
