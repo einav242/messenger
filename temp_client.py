@@ -103,8 +103,7 @@ class client:
 
     def download(self):
         try:
-            self.stop_download = False
-            self.wait = False
+            print("hi")
             temp2 = None
             temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -116,17 +115,23 @@ class client:
             endoffile = False
             lastpktreceived = time.time()
             starttime = time.time()
+            print("hi4")
             if file_save != "" and self.file.get() != "":
+                print("hi6")
                 self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
+                print("hi7")
                 size, address = self.soc.recvfrom(4096)
+                print("hi5")
                 if size.decode().split()[0] == "exist":
                     total_size = int(size.decode().split()[1])
                     while not endoffile:
                         try:
                             if self.stop_download:
+                                print("hi3")
                                 break
                             if self.wait:
                                 continue
+                            print("hi2")
                             self.rcvpkt = []
                             packet, clientAddress = self.soc.recvfrom(4096)
                             self.rcvpkt = pickle.loads(packet)
@@ -176,15 +181,15 @@ class client:
                     if not self.stop_download:
                         f.close()
                         m = "finish download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
-                            + "Time taken: " + str(endtime - starttime) + "\n"
+                            + "Time taken: " + str(endtime - starttime)+"\n"
                         self.input_area.config(state='normal')
                         self.input_area.insert(END, m)
                         self.input_area.yview('end')
                         self.input_area.config(state='disabled')
                     else:
                         f.close()
-                        m = "Stop download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
-                            + "Time taken: " + str(endtime - starttime) + "\n"
+                        m = "Stop download " + self.file.get() + " the last byte is: " + str(temp2) + "\n"\
+                            + "Time taken: " + str(endtime - starttime)+"\n"
                         self.input_area.config(state='normal')
                         self.input_area.insert(END, m)
                         self.input_area.yview('end')
@@ -210,11 +215,11 @@ class client:
     def no_button(self):
         no_msg = "STOP DOWNLOAD!"
         self.s.send(no_msg.encode())
+        self.stop_download = True
         try:
             self.wait_win.destroy()
         except:
             pass
-        self.stop_download = True
 
     def user_list(self):
         message = "send1234"
@@ -239,24 +244,18 @@ class client:
         self.running = False
         self.msg.destroy()
         self.s.close()
-        try:
-            self.soc.close()
-        except:
-            pass
+        self.soc.close()
         exit(0)
 
     def stop(self):
         self.running = False
         self.win.destroy()
         self.s.close()
-        try:
-            self.soc.close()
-        except:
-            pass
+        self.soc.close()
         exit(0)
 
     def close_wait_win(self):
-        self.stop_download = True
+        self.stop_download=True
         no_msg = "STOP DOWNLOAD!"
         self.s.send(no_msg.encode())
         try:
@@ -269,49 +268,43 @@ class client:
         while self.running:
             try:
                 message = self.s.recv(1024)
-                print("message: " + message.decode())
                 try:
                     if self.bool == False:
                         self.port = int(message.split()[1])
+                        print(self.port)
                         self.bool = True
                 except:
                     pass
-                try:
-                    if message.split()[0] == "NICK":
-                        self.port = message.split()[1]
-                        self.s.send(self.nickname.encode())
-                    elif message.decode() == "start download the file...":
-                        try:
-                            self.stop_download = False
-                            download_thread = threading.Thread(target=self.download)
-                            download_thread.start()
-                        except:
-                            pass
-                    elif message.decode() == "STOP AND WAIT":
-                        self.wait = True
-                        self.wait_win = Tk()
-                        self.wait_win.configure(background="white")
-                        Label(self.wait_win, text="Do you want to continue?", bg="white", fg="black",
-                              font="Helvetica 11 bold").grid(row=0, column=0, sticky=W)
-                        Button(self.wait_win, text="yes", width=12, command=self.yes_button, fg="black",
-                               bg="white").grid(
-                            row=1,
-                            column=0, sticky=W)
-                        Button(self.wait_win, text="No", width=12, command=self.no_button, fg="black", bg="white").grid(
-                            row=1,
-                            column=1, sticky=W)
-                        self.wait_win.protocol("WM_DELETE_WINDOW", self.close_wait_win)
-                        self.wait_win.mainloop()
-                    elif message.decode().split()[0] == "NEWPORT":
-                        self.port = int(message.decode().split()[1])
-                    else:
-                        if self.gui_done:
-                            self.input_area.config(state='normal')
-                            self.input_area.insert(END, message)
-                            self.input_area.yview('end')
-                            self.input_area.config(state='disabled')
-                except:
-                    continue
+                if message.split()[0] == "NICK":
+                    self.port = message.split()[1]
+                    self.s.send(self.nickname.encode())
+                elif message.decode() == "start download the file...":
+                    try:
+                        self.stop_download=False
+                        download_thread = threading.Thread(target=self.download)
+                        download_thread.start()
+                    except:
+                        pass
+                elif message.decode() == "STOP AND WAIT":
+                    self.wait = True
+                    self.wait_win = Tk()
+                    self.wait_win.configure(background="white")
+                    Label(self.wait_win, text="Do you want to continue?", bg="white", fg="black",
+                          font="Helvetica 11 bold").grid(row=0, column=0, sticky=W)
+                    Button(self.wait_win, text="yes", width=12, command=self.yes_button, fg="black", bg="white").grid(
+                        row=1,
+                        column=0, sticky=W)
+                    Button(self.wait_win, text="No", width=12, command=self.no_button, fg="black", bg="white").grid(
+                        row=1,
+                        column=1, sticky=W)
+                    self.wait_win.protocol("WM_DELETE_WINDOW", self.close_wait_win)
+                    self.wait_win.mainloop()
+                else:
+                    if self.gui_done:
+                        self.input_area.config(state='normal')
+                        self.input_area.insert(END, message)
+                        self.input_area.yview('end')
+                        self.input_area.config(state='disabled')
             except ConnectionAbortedError:
                 break
             except:
