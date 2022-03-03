@@ -177,9 +177,7 @@ class server:
             print("port: " + str(port))
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             soc.bind((HOST, port))
-            print("hi2")
             msg, address = soc.recvfrom(4096)
-            print("hi5")
             base = 1
             nextSeqnum = 1
             windowSize = 7
