@@ -8,25 +8,22 @@ import hashlib
 import pickle
 
 HOST = '127.0.0.1'
-PORT = 9090
+PORT = 50500
 
 
 class server:
     def __init__(self):
-        try:
-            self.port = 50000
-            self.count = 2
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.server.bind((HOST, PORT))
-            self.server.listen(15)
-            self.clients = []
-            self.nicknames = []
-            self.udp_port = dict()
-            self.stop_download = dict()
-            self.wait = dict()
-            self.running = True
-        except:
-            pass
+        self.port = 50000
+        self.count = 2
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind((HOST, PORT))
+        self.server.listen(15)
+        self.clients = []
+        self.nicknames = []
+        self.udp_port = dict()
+        self.stop_download = dict()
+        self.wait = dict()
+        self.running = True
         try:
             gui_thread = threading.Thread(target=self.gui_loop)
             gui_thread.start()
@@ -96,19 +93,7 @@ class server:
             try:
                 message = client.recv(1024)
             except:
-                index = self.clients.index(client)
-                self.clients.remove(client)
-                client.close()
-                nickname = self.nicknames[index]
-                del self.udp_port[nickname]
-                self.nicknames.remove(nickname)
-                name = nickname.split()[0]
-                m = f"{name} leave\n"
-                self.broadcast(m.encode())
-                Label(self.window, text=str(name) + " left", bg="white", fg="black",
-                      font="none 12 bold").grid(row=self.count, column=0, sticky=W)
-                self.count += 1
-                break
+                pass
             try:
                 if message.decode() == "show_file1234":
                     files = os.listdir()
@@ -117,6 +102,20 @@ class server:
                             continue
                         m = str(f) + "\n"
                         client.send(m.encode())
+                elif message.decode() == "END_CONNECTION":
+                    index = self.clients.index(client)
+                    self.clients.remove(client)
+                    client.close()
+                    nickname = self.nicknames[index]
+                    del self.udp_port[nickname]
+                    self.nicknames.remove(nickname)
+                    name = nickname.split()[0]
+                    m = f"{name} leave\n"
+                    self.broadcast(m.encode())
+                    Label(self.window, text=str(name) + " left", bg="white", fg="black",
+                          font="none 12 bold").grid(row=self.count, column=0, sticky=W)
+                    self.count += 1
+                    break
                 elif message.decode().split()[0] == "DOWNLOAD_ASK":
                     file_name = message.decode().split()[1]
                     name = message.decode().split()[2]
@@ -166,6 +165,7 @@ class server:
 
     def send_file(self, file_name, name):
         try:
+            once = False
             for n in self.nicknames:
                 i = str(n.split(":")[0])
                 if i == name:
@@ -174,7 +174,6 @@ class server:
                     break
             temp = 0
             port = self.udp_port[name]
-            print("port: " + str(port))
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             soc.bind((HOST, port))
             msg, address = soc.recvfrom(4096)
@@ -207,11 +206,11 @@ class server:
                             sndpkt.append(h.digest())
                             temp += len(data)
                             rate = int((temp / file_size) * 100)
-                            print(str(rate) + "%")
-                            if rate == 50:
+                            if rate == 50 and once == False:
                                 self.wait[name] = True
                                 stop_msg = "STOP AND WAIT"
                                 person.send(stop_msg.encode())
+                                once = True
                             soc.sendto(pickle.dumps(sndpkt), address)
                             nextSeqnum = nextSeqnum + 1
                             if not data:
@@ -246,7 +245,7 @@ class server:
                 m1 = "not"
                 self.soc.sendto(m1.encode(), address)
         except:
-             pass
+            pass
 
     def gui_loop(self):
         try:
@@ -270,7 +269,7 @@ class server:
             self.running = False
             self.window.destroy()
             self.server.close()
-            exit(0)
+            os._exit(0)
         except:
             pass
 
@@ -279,11 +278,11 @@ class server:
             self.running = False
             self.window.destroy()
             self.server.close()
-            exit(0)
+            os._exit(0)
         except:
             pass
 
-try:
-    server()
-except:
-    pass
+
+server()
+
+

@@ -3,6 +3,7 @@ import pickle
 import socket
 import threading
 from tkinter import *
+import os
 import tkinter.scrolledtext
 from tkinter import simpledialog, ttk
 import time
@@ -10,22 +11,20 @@ import time
 
 class client:
     def __init__(self, host, port2):
-        try:
-            self.port = None
-            self.bool = False
-            self.wait = False
-            self.stop_download = False
-            self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.s.connect((host, port2))
-            self.temp = tkinter.Tk()
-            self.temp.withdraw()
-            self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.temp)
-            self.gui_done = False
-            self.running = True
-            gui_thread = threading.Thread(target=self.gui_loop)
-            receive_thread = threading.Thread(target=self.receive)
-        except:
-            pass
+        self.port = None
+        self.bool = False
+        self.wait = False
+        self.stop_download = False
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.connect((host, port2))
+        self.temp = tkinter.Tk()
+        self.temp.withdraw()
+        self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.temp)
+        self.gui_done = False
+        self.running = True
+        gui_thread = threading.Thread(target=self.gui_loop)
+        receive_thread = threading.Thread(target=self.receive)
+
         try:
             gui_thread.start()
         except:
@@ -243,14 +242,16 @@ class client:
         self.msg.destroy()
         self.s.close()
         self.soc.close()
-        exit(0)
+        os._exit(0)
 
     def stop(self):
+        end_m = "END_CONNECTION"
+        self.s.send(end_m.encode())
         self.running = False
         self.win.destroy()
         self.s.close()
         self.soc.close()
-        exit(0)
+        os._exit(0)
 
     def receive(self):
         while self.running:
@@ -306,6 +307,6 @@ class client:
 
 
 try:
-    client("127.0.0.1", 9090)
+    client("127.0.0.1", 50500)
 except:
     pass
