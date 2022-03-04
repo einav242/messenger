@@ -39,3 +39,8 @@ It can be assumed that:
 
 ### **How to Run The Messenger:** 
 
+### **The GUI:** 
+**server:**
+<img width="228" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
+
+
