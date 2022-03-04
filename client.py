@@ -74,7 +74,7 @@ class client:
             Button(self.win, text=" New Download", width=12, command=self.clear).grid(row=12, column=2, sticky=W)
 
             Button(self.win, text="Log Out", width=12, command=self.stop, fg="black", bg="red").grid(row=17, column=0,
-                                                                                                     sticky=W)
+            sticky=W)
 
             self.my_progress = ttk.Progressbar(self.win, orient=HORIZONTAL, length=300, mode='determinate')
             self.my_progress.grid(row=12, column=0, sticky=W)
@@ -117,6 +117,7 @@ class client:
             temp2 = None
             temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.soc.settimeout(3)
             message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
             expectedseqnum = 1
@@ -127,7 +128,7 @@ class client:
             starttime = time.time()
             self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
             print("hi4")
-            size, address = self.soc.recvfrom(1024)
+            size, address = self.soc.recvfrom(5120)
             print("hi5")
             if size.decode().split()[0] == "exist":
                 total_size = int(size.decode().split()[1])
@@ -138,7 +139,7 @@ class client:
                         if self.wait:
                             continue
                         self.rcvpkt = []
-                        packet, clientAddress = self.soc.recvfrom(1024)
+                        packet, clientAddress = self.soc.recvfrom(5120)
                         self.rcvpkt = pickle.loads(packet)
                         c = self.rcvpkt[-1]
                         del self.rcvpkt[-1]

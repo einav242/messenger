@@ -165,15 +165,17 @@ class server:
 
     def send_file(self, file_name, name):
         try:
+            x=1
             once = False
             index = self.nicknames.index(name)
             person = self.clients[index]
             temp = 0
             port = self.udp_port[name]
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            soc.settimeout(3)
             soc.bind((HOST, port))
             print("name1: "+name)
-            msg, address = soc.recvfrom(1024)
+            msg, address = soc.recvfrom(5120)
             print("name: "+name)
             base = 1
             nextSeqnum = 1
@@ -184,7 +186,7 @@ class server:
             soc.sendto(m.encode(), address)
             if file_size <= 65536:
                 f = open(file_name, 'rb')
-                data = f.read(1)
+                data = f.read(x)
                 done = False
                 lastackreceived = time.time()
                 while not done or window:
@@ -213,9 +215,9 @@ class server:
                         if not data:
                             done = True
                         window.append(sndpkt)
-                        data = f.read(1)
+                        data = f.read(x)
                         try:
-                            packet, serverAddress = soc.recvfrom(1024)
+                            packet, serverAddress = soc.recvfrom(5120)
                             rcvpkt = []
                             rcvpkt = pickle.loads(packet)
                             c = rcvpkt[-1]
@@ -231,6 +233,7 @@ class server:
                             else:
                                 print("error detected")
                         except:
+                            x=500
                             if time.time() - lastackreceived > 0.1:
                                 for i in window:
                                     soc.sendto(pickle.dumps(i), address)
