@@ -111,97 +111,96 @@ class client:
 
     def download(self):
         try:
+            print("hi")
             self.stop_download = False
             self.wait = False
             temp2 = None
             temp = 0
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.soc.settimeout(3)
             message = self.nickname + " " + self.file.get()
             file_save = self.file_save.get()
             expectedseqnum = 1
+            print("hi2")
             f = open(file_save, "wb")
             endoffile = False
             lastpktreceived = time.time()
             starttime = time.time()
-            if file_save != "" and self.file.get() != "":
-                self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
-                size, address = self.soc.recvfrom(4096)
-                if size.decode().split()[0] == "exist":
-                    total_size = int(size.decode().split()[1])
-                    while not endoffile:
-                        try:
-                            if self.stop_download:
-                                break
-                            if self.wait:
-                                continue
-                            self.rcvpkt = []
-                            packet, clientAddress = self.soc.recvfrom(4096)
-                            self.rcvpkt = pickle.loads(packet)
-                            c = self.rcvpkt[-1]
-                            del self.rcvpkt[-1]
-                            h = hashlib.md5()
-                            h.update(pickle.dumps(self.rcvpkt))
-                            if c == h.digest():
-                                temp += (len(self.rcvpkt[1]))
-                                rate = int((temp / total_size) * 100)
-                                self.my_progress['value'] = rate
-                                self.my_label.config(text=str(rate) + "%")
-                                self.win.update()
-                                if self.rcvpkt[0] == expectedseqnum:
-                                    if self.rcvpkt[1]:
-                                        f.write(self.rcvpkt[1])
-                                        try:
-                                            temp2 = self.rcvpkt[1][-1]
-                                        except:
-                                            pass
-                                    else:
-                                        endoffile = True
-                                    expectedseqnum = expectedseqnum + 1
-                                    sndpkt = []
-                                    sndpkt.append(expectedseqnum)
-                                    h = hashlib.md5()
-                                    h.update(pickle.dumps(sndpkt))
-                                    sndpkt.append(h.digest())
-                                    self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
+            self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
+            print("hi4")
+            size, address = self.soc.recvfrom(1024)
+            print("hi5")
+            if size.decode().split()[0] == "exist":
+                total_size = int(size.decode().split()[1])
+                while not endoffile:
+                    try:
+                        if self.stop_download:
+                            break
+                        if self.wait:
+                            continue
+                        self.rcvpkt = []
+                        packet, clientAddress = self.soc.recvfrom(1024)
+                        self.rcvpkt = pickle.loads(packet)
+                        c = self.rcvpkt[-1]
+                        del self.rcvpkt[-1]
+                        h = hashlib.md5()
+                        h.update(pickle.dumps(self.rcvpkt))
+                        if c == h.digest():
+                            temp += (len(self.rcvpkt[1]))
+                            rate = int((temp / total_size) * 100)
+                            self.my_progress['value'] = rate
+                            self.my_label.config(text=str(rate) + "%")
+                            self.win.update()
+                            if self.rcvpkt[0] == expectedseqnum:
+                                if self.rcvpkt[1]:
+                                    f.write(self.rcvpkt[1])
+                                    temp2 = self.rcvpkt[1][-1]
                                 else:
-                                    sndpkt = []
-                                    sndpkt.append(expectedseqnum)
-                                    h = hashlib.md5()
-                                    h.update(pickle.dumps(sndpkt))
-                                    sndpkt.append(h.digest())
-                                    self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
-                                    print("Ack", expectedseqnum)
+                                    endoffile = True
+                                expectedseqnum = expectedseqnum + 1
+                                sndpkt = []
+                                sndpkt.append(expectedseqnum)
+                                h = hashlib.md5()
+                                h.update(pickle.dumps(sndpkt))
+                                sndpkt.append(h.digest())
+                                self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
                             else:
-                                print("error detected")
-                        except:
-                            if endoffile:
-                                if time.time() - lastpktreceived > 3:
-                                    break
+                                sndpkt = []
+                                sndpkt.append(expectedseqnum)
+                                h = hashlib.md5()
+                                h.update(pickle.dumps(sndpkt))
+                                sndpkt.append(h.digest())
+                                self.soc.sendto(pickle.dumps(sndpkt), (clientAddress[0], clientAddress[1]))
+                                print("Ack", expectedseqnum)
+                        else:
+                            print("error detected")
+                    except:
+                        if endoffile:
+                            if time.time() - lastpktreceived > 0.1:
+                                break
 
-                    endtime = time.time()
+                endtime = time.time()
 
-                    if not self.stop_download:
-                        f.close()
-                        m = "finish download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
-                            + "Time taken: " + str(endtime - starttime) + "\n"
-                        self.input_area.config(state='normal')
-                        self.input_area.insert(END, m)
-                        self.input_area.yview('end')
-                        self.input_area.config(state='disabled')
-                    else:
-                        f.close()
-                        m = "Stop download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
-                            + "Time taken: " + str(endtime - starttime) + "\n"
-                        self.input_area.config(state='normal')
-                        self.input_area.insert(END, m)
-                        self.input_area.yview('end')
-                        self.input_area.config(state='disabled')
-                        self.stop_download = False
+                if not self.stop_download:
+                    f.close()
+                    m = "finish download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
+                        + "Time taken: " + str(endtime - starttime) + "\n"
+                    self.input_area.config(state='normal')
+                    self.input_area.insert(END, m)
+                    self.input_area.yview('end')
+                    self.input_area.config(state='disabled')
+                else:
+                    f.close()
+                    m = "Stop download " + self.file.get() + " the last byte is: " + str(temp2) + "\n" \
+                        + "Time taken: " + str(endtime - starttime) + "\n"
+                    self.input_area.config(state='normal')
+                    self.input_area.insert(END, m)
+                    self.input_area.yview('end')
+                    self.input_area.config(state='disabled')
+                    self.stop_download = False
 
-                    self.file.delete(0, END)
-                    self.file_save.delete(0, END)
-                    self.soc.close()
+                self.file.delete(0, END)
+                self.file_save.delete(0, END)
+                self.soc.close()
         except:
             pass
 
@@ -306,7 +305,4 @@ class client:
                 exit(0)
 
 
-try:
-    client("127.0.0.1", 50500)
-except:
-    pass
+client("127.0.0.1", 50500)

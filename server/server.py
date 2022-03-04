@@ -166,59 +166,56 @@ class server:
     def send_file(self, file_name, name):
         try:
             once = False
-            for n in self.nicknames:
-                i = str(n.split(":")[0])
-                if i == name:
-                    index = self.nicknames.index(n)
-                    person = self.clients[index]
-                    break
+            index = self.nicknames.index(name)
+            person = self.clients[index]
             temp = 0
             port = self.udp_port[name]
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             soc.bind((HOST, port))
-            msg, address = soc.recvfrom(4096)
+            print("name1: "+name)
+            msg, address = soc.recvfrom(1024)
+            print("name: "+name)
             base = 1
             nextSeqnum = 1
             windowSize = 7
             window = []
-            files = os.listdir()
-            if file_name in files:
-                file_size = os.path.getsize(file_name)
-                m = "exist" + " " + str(file_size)
-                soc.sendto(m.encode(), address)
-                if file_size < 64000:
-                    f = open(file_name, 'rb')
-                    data = f.read(1)
-                    done = False
-                    lastackreceived = time.time()
-                    while not done or window:
-                        if self.stop_download[name]:
-                            soc.close()
-                            break
-                        if self.wait[name]:
-                            continue
-                        if (nextSeqnum < base + windowSize) and not done:
-                            sndpkt = []
-                            sndpkt.append(nextSeqnum)
-                            sndpkt.append(data)
-                            h = hashlib.md5()
-                            h.update(pickle.dumps(sndpkt))
-                            sndpkt.append(h.digest())
-                            temp += len(data)
-                            rate = int((temp / file_size) * 100)
-                            if rate == 50 and once == False:
-                                self.wait[name] = True
-                                stop_msg = "STOP AND WAIT"
-                                person.send(stop_msg.encode())
-                                once = True
-                            soc.sendto(pickle.dumps(sndpkt), address)
-                            nextSeqnum = nextSeqnum + 1
-                            if not data:
-                                done = True
-                            window.append(sndpkt)
-                            data = f.read(1)
+            file_size = os.path.getsize(file_name)
+            m = "exist" + " " + str(file_size)
+            soc.sendto(m.encode(), address)
+            if file_size <= 65536:
+                f = open(file_name, 'rb')
+                data = f.read(1)
+                done = False
+                lastackreceived = time.time()
+                while not done or window:
+                    if self.stop_download[name]:
+                        soc.close()
+                        break
+                    if self.wait[name]:
+                        time.sleep(1)
+                        continue
+                    if (nextSeqnum < base + windowSize) and not done:
+                        sndpkt = []
+                        sndpkt.append(nextSeqnum)
+                        sndpkt.append(data)
+                        h = hashlib.md5()
+                        h.update(pickle.dumps(sndpkt))
+                        sndpkt.append(h.digest())
+                        temp += len(data)
+                        rate = int((temp / file_size) * 100)
+                        if rate == 50 and once == False:
+                            self.wait[name] = True
+                            stop_msg = "STOP AND WAIT"
+                            person.send(stop_msg.encode())
+                            once = True
+                        soc.sendto(pickle.dumps(sndpkt), address)
+                        nextSeqnum = nextSeqnum + 1
+                        if not data:
+                            done = True
+                        window.append(sndpkt)
+                        data = f.read(1)
                         try:
-                            packet, serverAddress = soc.recvfrom(4096)
+                            packet, serverAddress = soc.recvfrom(1024)
                             rcvpkt = []
                             rcvpkt = pickle.loads(packet)
                             c = rcvpkt[-1]
@@ -227,23 +224,19 @@ class server:
                             h.update(pickle.dumps(rcvpkt))
                             if c == h.digest():
                                 # print("Received ack for", rcvpkt[0])
-                                while rcvpkt[0] > base and window:
+                                if rcvpkt[0] > base and window:
                                     lastackreceived = time.time()
                                     del window[0]
                                     base = base + 1
                             else:
                                 print("error detected")
                         except:
-                            if time.time() - lastackreceived > 0.01:
+                            if time.time() - lastackreceived > 0.1:
                                 for i in window:
                                     soc.sendto(pickle.dumps(i), address)
                 f.close()
                 soc.close()
                 self.stop_download[name] = False
-
-            else:
-                m1 = "not"
-                self.soc.sendto(m1.encode(), address)
         except:
             pass
 
@@ -284,5 +277,3 @@ class server:
 
 
 server()
-
-
