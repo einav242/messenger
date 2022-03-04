@@ -127,9 +127,7 @@ class client:
             lastpktreceived = time.time()
             starttime = time.time()
             self.soc.sendto(message.encode(), ("127.0.0.1", self.port))
-            print("hi4")
             size, address = self.soc.recvfrom(5120)
-            print("hi5")
             if size.decode().split()[0] == "exist":
                 total_size = int(size.decode().split()[1])
                 while not endoffile:
@@ -148,6 +146,8 @@ class client:
                         if c == h.digest():
                             temp += (len(self.rcvpkt[1]))
                             rate = int((temp / total_size) * 100)
+                            if rate>100:
+                                rate=100
                             self.my_progress['value'] = rate
                             self.my_label.config(text=str(rate) + "%")
                             self.win.update()
@@ -241,7 +241,7 @@ class client:
         self.running = False
         self.msg.destroy()
         self.s.close()
-        self.soc.close()
+        # self.soc.close()
         os._exit(0)
 
     def stop(self):
@@ -250,7 +250,7 @@ class client:
         self.running = False
         self.win.destroy()
         self.s.close()
-        self.soc.close()
+        # self.soc.close()
         os._exit(0)
 
     def receive(self):

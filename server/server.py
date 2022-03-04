@@ -7,6 +7,7 @@ import time
 import hashlib
 import pickle
 
+
 HOST = '127.0.0.1'
 PORT = 50500
 
@@ -164,8 +165,9 @@ class server:
                 pass
 
     def send_file(self, file_name, name):
+        x=1
         try:
-            x=1
+            x = 1
             once = False
             index = self.nicknames.index(name)
             person = self.clients[index]
@@ -174,9 +176,9 @@ class server:
             soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             soc.settimeout(3)
             soc.bind((HOST, port))
-            print("name1: "+name)
+            print("name1: " + name)
             msg, address = soc.recvfrom(5120)
-            print("name: "+name)
+            print("name: " + name)
             base = 1
             nextSeqnum = 1
             windowSize = 7
@@ -225,7 +227,6 @@ class server:
                             h = hashlib.md5()
                             h.update(pickle.dumps(rcvpkt))
                             if c == h.digest():
-                                # print("Received ack for", rcvpkt[0])
                                 if rcvpkt[0] > base and window:
                                     lastackreceived = time.time()
                                     del window[0]
@@ -233,14 +234,15 @@ class server:
                             else:
                                 print("error detected")
                         except:
-                            x=500
-                            if time.time() - lastackreceived > 0.1:
+                            x = 500
+                            if time.time() - lastackreceived > 0.01:
                                 for i in window:
                                     soc.sendto(pickle.dumps(i), address)
                 f.close()
                 soc.close()
                 self.stop_download[name] = False
         except:
+            x=500
             pass
 
     def gui_loop(self):
@@ -280,3 +282,4 @@ class server:
 
 
 server()
+
