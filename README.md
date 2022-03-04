@@ -41,6 +41,16 @@ It can be assumed that:
 
 ### **The GUI:** 
 **server:**
-<img width="228" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
+
+<img width="500" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
+
+**choose your Nickname:**
+
+<img width="400" alt="Capture1" src="https://user-images.githubusercontent.com/93201414/156809927-17d6ad70-3b81-4e99-8e2b-4df4746e76c7.PNG">
+
+
+**Let's start talking:**
+
+<img width="500" alt="Captur3" src="https://user-images.githubusercontent.com/93201414/156810273-d07eb558-719b-493b-b2ca-401a2ad30a8e.PNG">
 
 
