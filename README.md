@@ -54,7 +54,7 @@ Immediately, a window will pop up where we write down what nickname we want:<br 
 After we chose a nickname, we clicked OK.
 
 The chat window now opens To connect to the server, we click Start.<br />
-<img width="500" alt="Captur3" src="https://user-images.githubusercontent.com/93201414/156810273-d07eb558-719b-493b-b2ca-401a2ad30a8e.PNG"><br />
+<img width="500" alt="Captursasae" src="https://user-images.githubusercontent.com/93201414/156886749-a777e374-1a9e-4dd8-91e9-24c470c7c71c.PNG"><br />
 
 
 **Server:**<br />
