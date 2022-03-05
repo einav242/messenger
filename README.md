@@ -39,14 +39,14 @@ It can be assumed that:
 
 ### **How to Run The System:** 
 First we will run the server through the CMD By writing the line:<br />
-`python3 server.py` <br />
+`python3 Server.py` <br />
 and the next window will open:<br />
 
 <img width="500" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
 
 Then customers can be added to the system
 To add a client we will write the next line in CMD:<br />
-`python3 client.py`<br />
+`python3 Client.py`<br />
 Immediately, a window will pop up where we write down what nickname we want:<br />
 
 <img width="400" alt="Capture1" src="https://user-images.githubusercontent.com/93201414/156809927-17d6ad70-3b81-4e99-8e2b-4df4746e76c7.PNG">
