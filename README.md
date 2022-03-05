@@ -74,6 +74,11 @@ If you choose to download a document, during the process you will open the follo
 
 You can choose whether to continue downloading the document or stop the download process
 
+You can see that our system allows two customers to download the same file at the same time without a problem 
+
+<img width="991" alt="Capture540943" src="https://user-images.githubusercontent.com/93201414/156889173-4c69e48d-2dd6-4d15-bf2b-0a178be88432.PNG">
+
+
 ### **Diagram depicting our project:** 
 
 <p align="center" width="100%"><img width="500" alt="Capture58478943" src="https://user-images.githubusercontent.com/93201414/156886385-a5bdb531-31ae-4e4d-a16a-865e28a152aa.PNG">
