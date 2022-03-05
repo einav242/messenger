@@ -15,15 +15,16 @@ class server:
     def __init__(self):
         self.port = 50000
         self.count = 2
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # open tcp socket
         self.server.bind((HOST, PORT))
-        self.server.listen(15)
-        self.clients = []
-        self.nicknames = []
-        self.udp_port = dict()
-        self.stop_download = dict()
-        self.wait = dict()
-        self.running = True
+        self.server.listen(15)  # listen to 15 clients in the same time
+        self.clients = []  # list of clients
+        self.nicknames = []  # list of the nickname of the client
+        self.udp_port = dict()  # each client has a udp port so the server can send a file in paralle
+        self.stop_download = dict()  # if the client want to stop the download in the key of his name we chance to true
+        self.wait = dict()  # after the server download 50% of the file we chance the value that in key of the name of
+        # the client to be true and if the client want to continue the download in we chance it to true
+        self.running = True  # for the gui and for the server to know when to stop to listen
         try:
             gui_thread = threading.Thread(target=self.gui_loop)
             gui_thread.start()
@@ -34,7 +35,8 @@ class server:
         except:
             pass
 
-    def broadcast(self, message, non_receptors=None):
+    # function that send a message to everyone except "non_receptors"
+    def send_message(self, message, non_receptors=None):
         try:
             if non_receptors is None:
                 for client in self.clients:
@@ -50,16 +52,17 @@ class server:
     def receive(self):
         while self.running:
             try:
-                client, address = self.server.accept()
+                client, address = self.server.accept()  # when a client connected to the server
 
                 m = "NICK" + " " + str(self.port)
+                # ask for the nickname of the client and send a port number for the udp connection
                 client.send(m.encode('utf-8'))
                 nickname = client.recv(1024)
 
                 name = nickname.decode().split(":")[0]
 
                 self.udp_port[name] = self.port
-                self.port += 1
+                self.port += 1  # for the next client the connected
 
                 self.nicknames.append(name)
 
@@ -73,36 +76,40 @@ class server:
                       fg="black",
                       font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                 self.count += 1
-                self.broadcast(f"{name} connected to the server! \n".encode())
+
+                self.send_message(f"{name} connected to the server! \n".encode())
+                # send to everyone that "name" connect to the server
                 names = [n for n in self.nicknames if n is not client and n is not self.server]
+                #  send to the client all the clients that connect
                 m = "hello user! \n users online: " + str(names) + "\n"
                 m2 = "users online: " + str(names) + "\n"
-                self.broadcast(m2.encode(), client)
+                self.send_message(m2.encode(), client)
                 client.send(m.encode())
                 try:
-                    thread = threading.Thread(target=self.handle, args=(client, name,))
+                    thread = threading.Thread(target=self.get_message, args=(client, name,))
+                    # each client has their own thread
                     thread.start()
                 except:
                     break
             except:
                 break
 
-    def handle(self, client, nick):
+    def get_message(self, client, nick):  # over of all the types of messages and sends a response message respectively
         self.temp = -1
         while True:
             try:
-                message = client.recv(1024)
+                message = client.recv(1024)  # get a message from the client on tcp connection
             except:
                 pass
             try:
-                if message.decode() == "show_file1234":
+                if message.decode() == "show_file1234":  # the client want to see the file that inside the server folder
                     files = os.listdir()
                     for f in files:
                         if f == "Server.py":
                             continue
                         m = str(f) + "\n"
                         client.send(m.encode())
-                elif message.decode() == "END_CONNECTION":
+                elif message.decode() == "END_CONNECTION":  # the client want to disconnect
                     index = self.clients.index(client)
                     self.clients.remove(client)
                     client.close()
@@ -111,37 +118,37 @@ class server:
                     self.nicknames.remove(nickname)
                     name = nickname.split()[0]
                     m = f"{name} leave\n"
-                    self.broadcast(m.encode())
+                    self.send_message(m.encode())
                     Label(self.window, text=str(name) + " left", bg="white", fg="black",
                           font="none 12 bold").grid(row=self.count, column=0, sticky=W)
                     self.count += 1
                     break
-                elif message.decode().split()[0] == "DOWNLOAD_ASK":
+                elif message.decode().split()[0] == "DOWNLOAD_ASK":  # ask for download a file
                     file_name = message.decode().split()[1]
                     name = message.decode().split()[2]
                     files = os.listdir()
-                    if file_name in files:
+                    if file_name in files:  # checking if the file inside of the folder server
                         m = "start download the file..."
                         client.send(m.encode())
                         self.stop_download[nick] = False
                         self.wait[nick] = False
-                        self.file_thread = threading.Thread(target=self.send_file, args=(file_name, name,))
+                        self.file_thread = threading.Thread(target=self.download_file, args=(file_name, name,))
                         self.file_thread.start()
                     else:
                         m = "the file " + file_name + " does not exist\n"
                         client.send(m.encode())
-                elif message.decode() == "YES CONTINUE":
+                elif message.decode() == "YES CONTINUE":  # continue to download the file
                     self.wait[nick] = False
-                elif message.decode() == "STOP DOWNLOAD!":
-                    self.port += 1
+                elif message.decode() == "STOP DOWNLOAD!":  # stop the download the file
+                    self.port += 1  # chence udp port for the client
                     new_port = "NEWPORT" + " " + str(self.port)
                     client.send(new_port.encode())
+                    # sending to the client a new port because the socket may be still on when we try to download again
                     self.udp_port[nick] = self.port
-                    print("new port: " + str(self.udp_port[nick]))
-                    self.stop_download[nick] = True
-                elif message.decode().split()[0] == "private":
-                    user = message.decode().split()[3]
-                    for n in self.nicknames:
+                    self.stop_download[nick] = True  # that make to stop download the file
+                elif message.decode().split()[0] == "private":  # the client want to sent a private message
+                    user = message.decode().split()[3]  # the name of who the client want to send a message
+                    for n in self.nicknames:  # to find the right client to send the message
                         i = str(n.split(":")[0])
                         if i == user:
                             index = self.nicknames.index(n)
@@ -150,56 +157,54 @@ class server:
                             client.send(message)
                             self.temp = 0
                             break
-                    if self.temp != 0:
+                    if self.temp != 0:  # if the client does not exist
                         msg = f"user {user} not found \n"
                         client.send(msg.encode())
                     self.temp = -1
-                elif message.decode() == "send1234":
+                elif message.decode() == "send1234":  # the client want to know the name of the client that connected
                     names = [n for n in self.nicknames if n is not client and n is not self.server]
                     m = "users online: " + str(names) + "\n"
                     client.send(m.encode())
-                else:
-                    self.broadcast(message)
+                else:  # send everyone that connected the message
+                    self.send_message(message)
             except:
                 pass
 
-    def send_file(self, file_name, name):
+    def download_file(self, file_name, name):
         x = 1
         try:
             x = 1
+            first = 1
+            nextS = 1
+            windowSize = 7
+            window = []
             once = False
             index = self.nicknames.index(name)
             person = self.clients[index]
             temp = 0
             port = self.udp_port[name]
-            soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # open udp socket
             soc.settimeout(3)
             soc.bind((HOST, port))
-            print("name1: " + name)
-            msg, address = soc.recvfrom(5120)
-            print("name: " + name)
-            base = 1
-            nextSeqnum = 1
-            windowSize = 7
-            window = []
+            msg, c_address = soc.recvfrom(5120)
             file_size = os.path.getsize(file_name)
             m = "exist" + " " + str(file_size)
-            soc.sendto(m.encode(), address)
+            soc.sendto(m.encode(), c_address)
             if file_size <= 65536:
-                f = open(file_name, 'rb')
+                f = open(file_name, 'rb')  # open the file to send to the client
                 data = f.read(x)
-                done = False
-                lastackreceived = time.time()
-                while not done or window:
+                finish = False
+                start_time = time.time()
+                while not finish or window:
                     if self.stop_download[name]:
                         soc.close()
                         break
                     if self.wait[name]:
                         time.sleep(1)
                         continue
-                    if (nextSeqnum < base + windowSize) and not done:
+                    if (nextS < first + windowSize) and not finish:  # to check is the next date is in the window
                         sndpkt = []
-                        sndpkt.append(nextSeqnum)
+                        sndpkt.append(nextS)
                         sndpkt.append(data)
                         h = hashlib.md5()
                         h.update(pickle.dumps(sndpkt))
@@ -207,18 +212,19 @@ class server:
                         temp += len(data)
                         rate = int((temp / file_size) * 100)
                         if rate == 50 and once == False:
+                            # if we send 50% of the file to the client we wait for client to dicide if continue or not
                             self.wait[name] = True
                             stop_msg = "STOP AND WAIT"
                             person.send(stop_msg.encode())
                             once = True
-                        soc.sendto(pickle.dumps(sndpkt), address)
-                        nextSeqnum = nextSeqnum + 1
+                        soc.sendto(pickle.dumps(sndpkt), c_address)  # send to the client the packet
+                        nextS = nextS + 1
                         if not data:
-                            done = True
+                            finish = True
                         window.append(sndpkt)
                         data = f.read(x)
                         try:
-                            packet, serverAddress = soc.recvfrom(5120)
+                            packet, client_address = soc.recvfrom(5120)
                             rcvpkt = []
                             rcvpkt = pickle.loads(packet)
                             c = rcvpkt[-1]
@@ -226,17 +232,17 @@ class server:
                             h = hashlib.md5()
                             h.update(pickle.dumps(rcvpkt))
                             if c == h.digest():
-                                if rcvpkt[0] > base and window:
-                                    lastackreceived = time.time()
+                                if rcvpkt[0] > first and window:
+                                    start_time = time.time()
                                     del window[0]
-                                    base = base + 1
+                                    first = first + 1
                             else:
                                 print("error detected")
                         except:
                             x = 1024
-                            if time.time() - lastackreceived > 0.01:
+                            if time.time() - start_time > 0.01:
                                 for i in window:
-                                    soc.sendto(pickle.dumps(i), address)
+                                    soc.sendto(pickle.dumps(i), c_address)
                 f.close()
                 soc.close()
                 self.stop_download[name] = False
