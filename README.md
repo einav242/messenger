@@ -39,7 +39,7 @@ It can be assumed that:
 
 ### **How to Run The System:** 
 First we will run the server through the CMD By writing the line:<br />
-`python3 Server.py` <br />
+`python3 server.py` <br />
 The file server.py is in the folder server.
 and the next window will open:<br />
 
@@ -47,7 +47,7 @@ and the next window will open:<br />
 
 Now the client can be added to the system
 To add a client we will write the next line in CMD:<br />
-`python3 Client.py`<br />
+`python3 client.py`<br />
 Immediately, a window will pop up where we write down what nickname we want:<br />
 
 <img width="400" alt="Capture1" src="https://user-images.githubusercontent.com/93201414/156809927-17d6ad70-3b81-4e99-8e2b-4df4746e76c7.PNG">
