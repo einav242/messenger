@@ -69,6 +69,9 @@ To disconnect from the server, click a button: **log out**
 5. Download a file 
 6. To disconnect from the server, click the button: **Log Out**
 
+If you choose to download a document, during the process you will open the following window:<br />
+<img width="500" alt="Captfure" src="https://user-images.githubusercontent.com/93201414/156887016-0adf1c0c-a251-4fba-9414-8944c258f161.PNG">
+
 ### **Diagram depicting our project:** 
 
 <p align="center" width="100%"><img width="500" alt="Capture58478943" src="https://user-images.githubusercontent.com/93201414/156886385-a5bdb531-31ae-4e4d-a16a-865e28a152aa.PNG">
