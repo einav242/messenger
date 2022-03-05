@@ -40,11 +40,12 @@ It can be assumed that:
 ### **How to Run The System:** 
 First we will run the server through the CMD By writing the line:<br />
 `python3 Server.py` <br />
+The file server.py is in the folder server.
 and the next window will open:<br />
 
 <img width="500" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
 
-Then customers can be added to the system
+Now the client can be added to the system
 To add a client we will write the next line in CMD:<br />
 `python3 Client.py`<br />
 Immediately, a window will pop up where we write down what nickname we want:<br />
