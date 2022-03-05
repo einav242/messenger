@@ -22,7 +22,6 @@ class Testserver(TestCase):
 
     def test_check_server(self):
         self.serv = server_for_test.server()
-        # self.serv = Server.server()
 
     def test_check_client(self):
         self.cl = client_for_test.client("127.0.0.1", 50500)
