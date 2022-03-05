@@ -37,20 +37,40 @@ It can be assumed that:
 1. The number of messages per customer should not exceed 100 messages.
 2. The maximum size per package (datagram) for UDP transfer is kB64 so it is 127.0.0.1 or localhost.
 
-### **How to Run The Messenger:** 
-
-### **The GUI:** 
-**server:**
+### **How to Run The System:** 
+First we will run the server through the CMD By writing the line:<br />
+`python3 server.py` <br />
+and the next window will open:<br />
 
 <img width="500" alt="Capture" src="https://user-images.githubusercontent.com/93201414/156808756-76684d99-726d-4e39-9c87-0342951a45b9.PNG">
 
-**choose your Nickname:**
+Then customers can be added to the system
+To add a client we will write the next line in CMD:<br />
+`python3 client.py`<br />
+Immediately, a window will pop up where we write down what nickname we want:<br />
 
 <img width="400" alt="Capture1" src="https://user-images.githubusercontent.com/93201414/156809927-17d6ad70-3b81-4e99-8e2b-4df4746e76c7.PNG">
 
+After we chose a nickname, we clicked OK.
 
-**Let's start talking:**
+The chat window now opens To connect to the server, we click Start.<br />
+<img width="500" alt="Captur3" src="https://user-images.githubusercontent.com/93201414/156810273-d07eb558-719b-493b-b2ca-401a2ad30a8e.PNG"><br />
 
-<img width="500" alt="Captur3" src="https://user-images.githubusercontent.com/93201414/156810273-d07eb558-719b-493b-b2ca-401a2ad30a8e.PNG">
+
+**Server:**<br />
+To disconnect from the server, click a button: **log out**
+
+**Actions that the client can perform:**<br />
+1. Show the names of the clients Online by clicking the button: **Show Online**
+2. Show the files on the server by clicking the button: **Show Srever File**
+3. Send a message to everyone in the group by writing the message **&** pressing a button: **Send all**
+4. Send a private message by writing the message **&** the name of the customer you want to send to in the pane: **To**,<br />
+**&** pressing a button: **Send private**
+5. Download a file 
+6. To disconnect from the server, click the button: **Log Out**
+
+### **Diagram depicting our project:** 
+
+<p align="center" width="100%"><img width="500" alt="Capture58478943" src="https://user-images.githubusercontent.com/93201414/156886385-a5bdb531-31ae-4e4d-a16a-865e28a152aa.PNG">
 
 
