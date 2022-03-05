@@ -7,7 +7,6 @@ import time
 import hashlib
 import pickle
 
-
 HOST = '127.0.0.1'
 PORT = 50500
 
@@ -99,7 +98,7 @@ class server:
                 if message.decode() == "show_file1234":
                     files = os.listdir()
                     for f in files:
-                        if f == "server.py":
+                        if f == "Server.py":
                             continue
                         m = str(f) + "\n"
                         client.send(m.encode())
@@ -165,7 +164,7 @@ class server:
                 pass
 
     def send_file(self, file_name, name):
-        x=1
+        x = 1
         try:
             x = 1
             once = False
@@ -234,7 +233,7 @@ class server:
                             else:
                                 print("error detected")
                         except:
-                            x = 500
+                            x = 1024
                             if time.time() - lastackreceived > 0.01:
                                 for i in window:
                                     soc.sendto(pickle.dumps(i), address)
@@ -242,7 +241,7 @@ class server:
                 soc.close()
                 self.stop_download[name] = False
         except:
-            x=500
+            x = 1024
             pass
 
     def gui_loop(self):
@@ -282,4 +281,3 @@ class server:
 
 
 server()
-

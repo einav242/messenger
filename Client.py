@@ -11,6 +11,7 @@ import time
 
 class client:
     def __init__(self, host, port2):
+        self.running = True
         self.port = None
         self.bool = False
         self.wait = False
@@ -21,7 +22,6 @@ class client:
         self.temp.withdraw()
         self.nickname = simpledialog.askstring("Nickname", "please choose a nickname", parent=self.temp)
         self.gui_done = False
-        self.running = True
         gui_thread = threading.Thread(target=self.gui_loop)
         receive_thread = threading.Thread(target=self.receive)
 
@@ -111,7 +111,6 @@ class client:
 
     def download(self):
         try:
-            print("hi")
             self.stop_download = False
             self.wait = False
             temp2 = None

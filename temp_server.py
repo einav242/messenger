@@ -87,7 +87,7 @@ class server:
                 if message.decode() == "show_file1234":
                     files = os.listdir()
                     for f in files:
-                        if f == "server.py":
+                        if f == "Server.py":
                             continue
                         m = str(f) + "\n"
                         client.send(m.encode())
