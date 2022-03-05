@@ -65,17 +65,17 @@ To disconnect from the server, click a button: **log out**
 1. Show the names of the clients Online by clicking the button: **Show Online**
 2. Show the files on the server by clicking the button: **Show Srever File**
 3. Send a message to everyone in the group by writing the message **&** pressing a button: **Send all**
-4. Send a private message by writing the message **&** the name of the customer you want to send to in the pane: **To**,<br />
+4. Send a private message by writing the message **&** the name of the client you want to send to in the pane: **To**,<br />
 **&** pressing a button: **Send private**
 5. Download a file 
-6. To disconnect from the server, click the button: **Log Out**
+6. To disconnect from the client, click the button: **Log Out**
 
 If you choose to download a document, during the process you will open the following window:<br />
 <img width="500" alt="Captfure" src="https://user-images.githubusercontent.com/93201414/156887016-0adf1c0c-a251-4fba-9414-8944c258f161.PNG">
 
 You can choose whether to continue downloading the document or stop the download process
 
-You can see that our system allows two customers to download the same file at the same time without a problem 
+You can see that our system allows two clients to download the same file at the same time without a problem 
 
 <img width="991" alt="Capture540943" src="https://user-images.githubusercontent.com/93201414/156889173-4c69e48d-2dd6-4d15-bf2b-0a178be88432.PNG">
 
